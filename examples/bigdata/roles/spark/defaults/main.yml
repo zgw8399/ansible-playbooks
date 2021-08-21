@@ -1,0 +1,40 @@
+---
+# default vars file for spark role
+#
+java_home: /usr/lib/jvm/java-8-openjdk-amd64
+#
+hdfs_cluster_name: mycluster
+hadoop_conf_dir: /usr/local/hadoop/etc/hadoop
+#
+spark_url: http://10.9.36.96/downloads/bigdata
+spark_version: 2.4.3
+spark_install_path: /usr/local
+spark_home: /usr/local/spark
+#
+spark_conf_dir: /usr/local/spark/conf
+#
+spark_master: yarn
+spark_submit_deploymode: cluster
+#
+spark_driver_cores: 1
+spark_driver_memory: 1g
+spark_yarn_driver_memoryoverhead: 400
+#
+spark_yarn_am_cores: 1
+spark_yarn_am_memory: 1g
+spark_yarn_am_memoryoverhead: 400
+#
+spark_executor_cores: 1
+spark_executor_memory: 1g
+spark_yarn_executor_memoryoverhead: 400
+spark_executor_instances: 2
+#
+spark_eventlog_enabled: true
+spark_eventlog_dir: "spark-logs"
+spark_eventlog_compress: true
+#
+spark_yarn_jars_dir: "spark-jars"
+spark_serializer: "org.apache.spark.serializer.KryoSerializer"
+#
+spark_history_ui_port: 18080
+spark_history_retainedapplications: 3

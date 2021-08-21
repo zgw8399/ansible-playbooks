@@ -1,0 +1,32 @@
+- import_tasks: ubuntu.yml
+
+- name: "Set net.ipv4.ip_nonlocal_bind"
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+
+- name: "Get mail_notify script"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/keepalived/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - mail_notify.py
+
+- name: "Configure keepalived"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/keepalived/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - keepalived.conf
+  notify:
+    - restart keepalived

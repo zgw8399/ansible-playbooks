@@ -1,0 +1,5 @@
+---
+# default vars for zabbix agent role
+#
+zabbix_server_address: 10.9.36.177
+zabbix_server_active: 10.9.36.177:10051

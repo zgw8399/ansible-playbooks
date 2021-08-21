@@ -1,0 +1,14 @@
+[DEFAULT]
+log_dir = /var/log/keystone
+bind_host = {{ ansible_default_ipv4.address }}
+public_bind_host = {{ ansible_default_ipv4.address }}
+admin_bind_host = {{ ansible_default_ipv4.address }}
+
+[database]
+connection = mysql+pymysql://keystone:{{ keystone_dbpass }}@{{ controller_host }}/keystone
+
+[extra_headers]
+Distribution = Ubuntu
+
+[token]
+provider = fernet

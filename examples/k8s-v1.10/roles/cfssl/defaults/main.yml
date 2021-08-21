@@ -1,0 +1,18 @@
+---
+# default var file for cfssl role
+#
+# for cfssl
+cfssl_url: https://pkg.cfssl.org/R1.2
+cfssl_bin: cfssl_linux-amd64
+cfssljson_bin: cfssljson_linux-amd64
+cfssl_install_path: /usr/local/bin
+cfssl_conf_dir: /etc/cfssl
+cfssl_certs_dir: /etc/cfssl/certs
+#
+# for k8s
+kube_master_1: k8s-21
+kube_master_1_ip: 10.9.36.21
+kube_master_2: k8s-22
+kube_master_2_ip: 10.9.36.22
+kube_master_3: k8s-23
+kube_master_3_ip: 10.9.36.23

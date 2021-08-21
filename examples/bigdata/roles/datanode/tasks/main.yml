@@ -1,0 +1,5 @@
+- name: "Start DataNode daemon"
+  shell: "su - hdfs -c 'hadoop-daemon.sh start datanode' && touch start-datanode.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-datanode.done

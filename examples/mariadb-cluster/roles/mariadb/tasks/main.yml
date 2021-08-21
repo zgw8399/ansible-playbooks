@@ -1,0 +1,45 @@
+- import_tasks: ubuntu.yml
+
+- name: "Install apparmor tools"
+  apt:
+    name: apparmor-utils
+    state: present
+    update_cache: yes
+
+- name: "Process apparmor bug for mariadb"
+  shell: "if [ -f /etc/apparmor.d/usr.sbin.mysqld ]; then echo '/usr/sbin/mysqld { }' > /etc/apparmor.d/usr.sbin.mysqld; fi && apparmor_parser -v -R /etc/apparmor.d/usr.sbin.mysqld && touch /etc/mysql/apparmor_parser_mysqld.done"
+  args:
+    creates: "/etc/mysql/apparmor_parser_mysqld.done"
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Modify the /lib/systemd/system/mariadb.service file to change the value of ProtectHome to false"
+  lineinfile:
+    path: /lib/systemd/system/mariadb.service
+    regexp: '^ProtectHome='
+    line: 'ProtectHome=false'
+
+- name: "Config mariadb for the first node"
+  template:
+    src: "mariadb.cnf.j2"
+    dest: "/etc/mysql/mariadb.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  when: node_role == "first"
+
+- name: "Initialize the cluster on the first node"
+  shell: "service mysql stop && systemctl daemon-reload && service mysql start --wsrep-new-cluster && touch /etc/mysql/init-cluster.done"
+  args:
+    creates: /etc/mysql/init-cluster.done
+  when: node_role == "first"
+
+- name: "Config mariadb for the other nodes"
+  template:
+    src: "mariadb.cnf.j2"
+    dest: "/etc/mysql/mariadb.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart mariadb
+  when: node_role == "other"

@@ -1,0 +1,67 @@
+---
+# handlers for controller role
+#
+- name: restart chrony
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: chrony
+
+- name: restart memcached
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: memcached
+
+- name: restart apache2
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: apache2
+
+- name: reloaded apache2
+  systemd:
+    state: reloaded
+    name: apache2
+
+- name: restart glance-api
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: glance-api
+
+- name: restart nova-api
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nova-api
+
+- name: restart nova-scheduler
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nova-scheduler
+
+- name: restart nova-conductor
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nova-conductor
+
+- name: restart nova-novncproxy
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nova-novncproxy
+
+- name: restart neutron-server
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: neutron-server
+
+- name: restart cinder-scheduler
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: cinder-scheduler

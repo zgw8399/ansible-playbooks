@@ -1,0 +1,17 @@
+- name: "Configure placement"
+  template:
+    src: placement.conf.j2
+    dest: /etc/placement/placement.conf
+    owner: root
+    group: placement
+    mode: '0644'
+  notify: restart apache2
+
+- name: "Import placement data"
+  shell: |
+    su -s /bin/sh -c "placement-manage db sync" placement && touch import_data.done
+  args:
+    chdir: /etc/placement
+    creates: import_data.done
+  run_once: true
+  delegate_to: "{{ controller_host }}"

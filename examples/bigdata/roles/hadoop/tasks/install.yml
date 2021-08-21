@@ -1,0 +1,68 @@
+- name: "Get binary installation package"
+  get_url:
+    url: "{{ hadoop_url }}/hadoop-{{ hadoop_version }}.tar.gz"
+    dest: "{{ hadoop_install_path }}/hadoop-{{ hadoop_version }}.tar.gz"
+    mode: 0440
+
+- name: "Extract the binary package"
+  shell: "if [ -f hadoop-{{ hadoop_version }}.tar.gz ]; then tar -zxf hadoop-{{ hadoop_version }}.tar.gz; fi && touch extract-hadoop.done"
+  args:
+    chdir: "{{ hadoop_install_path }}"
+    creates: extract-hadoop.done
+
+- name: "Create a link directory"
+  file:
+    src: "{{ hadoop_install_path }}/hadoop-{{ hadoop_version }}"
+    dest: "{{ hadoop_home }}"
+    state: link
+
+- name: "Set directory permissions"
+  file:
+    path: "{{ hadoop_install_path }}/hadoop-{{ hadoop_version }}"
+    owner: root
+    group: bigdata
+    state: directory
+    mode: 0775
+    recurse: yes
+  changed_when: false
+
+- name: "Configuring environment variables for hadoop"
+  template:
+    src: hadoop.sh.j2
+    dest: /etc/profile.d/hadoop.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Configuring hadoop"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ hadoop_conf_dir }}/{{ item.dest }}"
+    owner: root
+    group: bigdata
+    mode: 0664
+  with_items:
+    - { src: "hadoop-env.sh.j2", dest: "hadoop-env.sh" }
+    - { src: "yarn-env.sh.j2", dest: "yarn-env.sh" }
+    - { src: "core-site.xml.j2", dest: "core-site.xml" }
+    - { src: "hdfs-site.xml.j2", dest: "hdfs-site.xml" }
+    - { src: "mapred-site.xml.j2", dest: "mapred-site.xml" }
+    - { src: "yarn-site.xml.j2", dest: "yarn-site.xml" }
+    - { src: "slaves.j2", dest: "slaves" }
+    - { src: "dfs-hosts-exclude.j2", dest: "dfs-hosts-exclude" }
+    - { src: "yarn-nodes-exclude.j2", dest: "yarn-nodes-exclude" }
+  changed_when: false
+
+- name: "Create some directories"
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: bigdata
+    state: directory
+    mode: 0775
+  with_items:
+    - "{{ hadoop_tmp_dir }}"
+    - "{{ hadoop_log_dir }}"
+    - "{{ dfs_namenode_name_dir }}"
+    # - "{{ dfs_datanode_data_dir }}"
+    - "{{ dfs_journalnode_edits_dir }}"

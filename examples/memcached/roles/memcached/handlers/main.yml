@@ -1,0 +1,7 @@
+---
+# handlers file for memcached role
+#
+- name: restart memcached
+  service:
+    name=memcached
+    state=restarted

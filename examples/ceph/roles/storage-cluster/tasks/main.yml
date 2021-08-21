@@ -1,0 +1,62 @@
+- name: "Create the dir for storage-cluster"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ storage_cluster_dir }}"
+
+- name: "Create a storage cluster"
+  shell: |
+    ceph-deploy new --public-network {{ public_network }} {{ mon_initial_members }}
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: ceph.conf
+
+- name: "Generate the storage cluster configuration"
+  template:
+    src: ceph.conf.j2
+    dest: "{{ storage_cluster_dir }}/ceph.conf"
+    backup: yes
+
+- name: "Generate cluster keys"
+  shell: |
+    ceph-deploy mon create-initial
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: ceph.client.admin.keyring
+
+- name: "Generate cluster nodes"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ storage_cluster_dir }}/{{ item }}"
+    backup: yes
+  with_items:
+    - all.list
+    - osd.list
+    - mon.list
+    - mgr.list
+    - mds.list
+
+- name: "Distribute keys and configuration files"
+  shell: |
+    cat all.list | xargs ceph-deploy admin && \
+    touch distribute-keys.done
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: distribute-keys.done
+
+- name: "Add mgr node"
+  shell: |
+    cat mgr.list | xargs ceph-deploy mgr create && \
+    touch add-mgr.done
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: add-mgr.done
+
+- name: "Add mds node"
+  shell: |
+    cat mds.list | xargs ceph-deploy mds create && \
+    touch add-mds.done
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: add-mds.done

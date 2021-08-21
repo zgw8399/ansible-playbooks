@@ -1,0 +1,3 @@
+- name: "Modify hostname"
+  hostname:
+    name: "{{ hostname_prefix }}-{{ ansible_default_ipv4.address.split('.')[-1] }}"

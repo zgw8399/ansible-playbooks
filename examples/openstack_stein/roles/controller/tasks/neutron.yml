@@ -1,0 +1,21 @@
+- name: "Configure neutron"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: neutron
+    mode: '0644'
+  with_items:
+    - { src: "neutron.conf.j2", dest: "/etc/neutron/neutron.conf" }
+    - { src: "ml2_conf.ini.j2", dest: "/etc/neutron/plugins/ml2/ml2_conf.ini" }
+  notify:
+    - restart neutron-server
+
+- name: "Import neutron data"
+  shell: |
+    su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron && touch impport_data.done
+  args:
+    chdir: /etc/neutron
+    creates: impport_data.done
+  run_once: true
+  delegate_to: "{{ controller_host }}"

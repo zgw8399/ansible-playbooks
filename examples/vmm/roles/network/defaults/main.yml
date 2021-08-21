@@ -1,0 +1,10 @@
+---
+# default vars for network role
+#
+default_gateway: 10.9.36.254
+master_nameserver: 10.9.33.60
+backup_nameserver: 202.96.128.86
+vlan_ids:
+  - 100
+  - 200
+vlan_link_eth: ens34

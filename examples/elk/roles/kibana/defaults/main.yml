@@ -1,0 +1,4 @@
+---
+# default vars for kibana role
+#
+kibana_deb_url: http://10.9.36.96/downloads/ELK/kibana-7.0.0-amd64.deb

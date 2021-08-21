@@ -1,0 +1,17 @@
+---
+- hosts: testserver
+  
+  become: yes
+
+  vars:
+    - user_mame: hadoop
+
+  tasks:
+    - name: "Add sudo privilegus for user"
+      lineinfile:
+        path: "/etc/sudoers.d/{{ user_mame }}"
+        line: "{{ user_mame }} ALL=(ALL) NOPASSWD: ALL"
+        owner: root
+        group: root
+        mode: 0440
+        create: yes

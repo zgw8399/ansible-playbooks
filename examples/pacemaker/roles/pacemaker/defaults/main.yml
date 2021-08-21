@@ -1,0 +1,9 @@
+---
+# default vars for role
+#
+# generate password command: "mkpasswd --method=sha-512"
+hacluster_pass: "$6$cn9kFuMz54$htvJ1xPyOZROiDHlWqlmlOVz2FIU8xjTvdeZXNziY2/YftGQQm8MvnB9BSJf3MHAAe.TUIKmt7L17wc0RczHw."
+ha_cluster_name: cluster1
+interface_bind_net_addr: 10.9.36.0
+node1_ring0_addr: HA1
+node2_ring0_addr: HA2

@@ -1,0 +1,12 @@
+---
+# handlers for common role
+#
+- name: restart chrony
+  service:
+    name: chrony
+    state: restarted
+
+- name: restart ssh
+  service:
+    name: ssh
+    state: restarted

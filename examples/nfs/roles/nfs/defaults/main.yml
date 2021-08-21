@@ -1,0 +1,9 @@
+---
+# default vars for nfs role
+#
+export_dirs:
+  - /nfs/data1
+  - /nfs/data2
+  - /nfs/data3
+  - /nfs/data4
+  - /nfs/data5

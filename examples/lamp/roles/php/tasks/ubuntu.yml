@@ -1,0 +1,21 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install php"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - php-mysql
+    - php-curl
+    - php-json
+    - php-cgi
+    - php
+    - libapache2-mod-php
+    - php-mbstring
+    - php-gettext

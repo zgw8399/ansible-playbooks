@@ -1,0 +1,5 @@
+- name: "Start HttpFS daemon"
+  shell: "su - hdfs -c 'httpfs.sh start' && touch start-httpfs.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-httpfs.done

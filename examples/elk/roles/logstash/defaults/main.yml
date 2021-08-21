@@ -1,0 +1,4 @@
+---
+# default vars for logstash role
+#
+logstash_deb_url: http://10.9.36.96/downloads/ELK/logstash-7.0.0.deb

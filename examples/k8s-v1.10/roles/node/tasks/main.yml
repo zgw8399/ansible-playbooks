@@ -1,0 +1,45 @@
+- name: "Create the required directory"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ kube_pki_dir }}"
+    - "{{ kube_manifests_dir }}"
+    - "{{ kubelet_service_conf_dir }}"
+    - "{{ kubelet_data_dir }}"
+    - "{{ kube_log_dir }}"
+    - "{{ cni_conf_dir }}"
+    - "{{ cni_bin_dir }}"
+
+- name: "Get the required certs"
+  copy:
+    src: "{{ cfssl_certs_dir }}/{{ item }}"
+    dest: "{{ kube_pki_dir }}/{{ item }}"
+    mode: 0640
+  with_items:
+    - etcd-ca-key.pem
+    - etcd-ca.pem
+    - etcd-key.pem
+    - etcd.pem
+    - ca-key.pem
+    - ca.pem
+    - kube-proxy-key.pem
+    - kube-proxy.pem
+
+- name: "Get the required configuration file"
+  copy:
+    src: "{{ kube_conf_dir }}/{{ item }}"
+    dest: "{{ kube_conf_dir }}/{{ item }}"
+  with_items:
+    - kube-proxy.conf
+    - bootstrap.conf
+
+- name: "Generate kubelet service file"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - { src: "kubelet.service.j2", dest: "/lib/systemd/system/kubelet.service" }
+    - { src: "10-kubelet.conf.j2", dest: "/etc/systemd/system/kubelet.service.d/10-kubelet.conf" }
+  notify: restart kubelet

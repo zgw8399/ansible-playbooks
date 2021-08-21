@@ -1,0 +1,4 @@
+---
+# default vars for elasticsearch role
+#
+elasticsearch_deb_url: http://10.9.36.96/downloads/ELK/elasticsearch-7.0.0-amd64.deb 

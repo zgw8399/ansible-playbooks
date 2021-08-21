@@ -1,0 +1,13 @@
+---
+- hosts: testserver
+
+  become: true
+
+  tasks:
+    - name: "Batch generation of host entries"
+      template:
+        src: templates/host-entries.j2
+        dest: ~/host-entries
+        owner: root
+        group: root
+        mode: 0644

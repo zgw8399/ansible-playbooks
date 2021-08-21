@@ -1,0 +1,3 @@
+{% for id in range(201,211) %}
+192.168.22.{{ id }}  webserver-{{ "%02d"|format(id-200) }}
+{% endfor %}

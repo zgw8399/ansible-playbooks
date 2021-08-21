@@ -1,0 +1,45 @@
+- import_tasks: ubuntu.yml
+
+- name: "Install apparmor tools"
+  apt:
+    name: apparmor-utils
+    state: present
+    update_cache: yes
+
+- name: "Process apparmor bug for mariadb"
+  shell: "if [ -f /etc/apparmor.d/usr.sbin.mysqld ]; then echo '/usr/sbin/mysqld { }' > /etc/apparmor.d/usr.sbin.mysqld; fi && apparmor_parser -v -R /etc/apparmor.d/usr.sbin.mysqld && touch /etc/mysql/apparmor_parser_mysqld.done"
+  args:
+    creates: "/etc/mysql/apparmor_parser_mysqld.done"
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Config mariadb"
+  template:
+    src: "mariadb.cnf.j2"
+    dest: "/etc/mysql/mariadb.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart mariadb
+
+- meta: flush_handlers
+
+- name: "Create database"
+  mysql_db:
+    name: "{{ dbname }}"
+    state: present
+
+- name: "Create local user"
+  mysql_user:
+    name: "{{ dbuser }}"
+    password: "{{ dbpassword }}"
+    priv: "{{ dbname }}.*:ALL"
+    state: present
+
+- name: "Create remote user"
+  mysql_user:
+    name: "{{ dbuser }}"
+    password: "{{ dbpassword }}"
+    priv: "{{ dbname }}.*:ALL"
+    state: present
+    host: "{{ remote_access_host }}"

@@ -1,0 +1,17 @@
+---
+# default vars file for common role
+#
+ntp_servers:
+  - 10.9.36.10
+  - 10.9.40.35
+#
+deploy_user_name: cephadmin
+deploy_user_id: 1100
+# generate password command: "mkpasswd --method=sha-512"
+deploy_user_password: "$6$bmLa4NyPpI$ZJIB3MDt5CaZ2zE/aMZQRVECr51MODfoHoLa/ShlxD6nCihN5SpfBmQhzy9b3tpPZm92.4gPdaEGlSVKBwMm8/"
+deploy_user_comment: "Ceph Deploy User"
+deploy_user_shell: /bin/bash
+#
+local_user: keda
+#
+hostname_prefix: ceph

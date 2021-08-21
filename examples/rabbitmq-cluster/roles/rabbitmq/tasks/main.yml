@@ -1,0 +1,75 @@
+- import_tasks: ubuntu.yml
+
+- name: "Configure node ip"
+  lineinfile:
+    path: /etc/rabbitmq/rabbitmq-env.conf
+    regexp: '^NODE_IP_ADDRESS='
+    insertafter: '^#NODE_IP_ADDRESS='
+    line: 'NODE_IP_ADDRESS={{ ansible_ens3.ipv4.address }}'
+    owner: rabbitmq
+    group: rabbitmq
+    mode: '0644'
+  notify: restart rabbitmq
+
+- name: "Configure erlang cookie"
+  template:
+    src: erlang.cookie.j2
+    dest: /var/lib/rabbitmq/.erlang.cookie
+    owner: rabbitmq
+    group: rabbitmq
+    mode: '0400'
+  notify: restart rabbitmq
+
+- meta: flush_handlers
+
+- name: "Join other nodes into cluster"
+  shell: |
+    rabbitmqctl stop_app && \
+    rabbitmqctl join_cluster rabbit@{{ first_node_hostname }} && \
+    rabbitmqctl start_app && \
+    touch join_cluster.done
+  args:
+    chdir: /var/lib/rabbitmq
+    creates: join_cluster.done
+  when: node_role == "other"
+
+- name: "Remove guest user"
+  rabbitmq_user:
+    user: guest
+    state: absent
+  run_once: true
+  delegate_to: "{{ first_node_ip }}"
+
+- name: "Add user and assign permissions"
+  rabbitmq_user:
+    user: "{{ admin_user }}"
+    password: "{{ admin_pass }}"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+  run_once: true
+  delegate_to: "{{ first_node_ip }}"
+
+- name: "Account join manager"
+  shell: |
+    rabbitmqctl set_user_tags {{ admin_user }} administrator
+  run_once: true
+  delegate_to: "{{ first_node_ip }}"
+
+- name: "Enable plugins"
+  shell: |
+    rabbitmq-plugins enable {{ item }}
+  with_items:
+    - rabbitmq_management
+
+- name: "Config ha rule"
+  rabbitmq_policy:
+    name: HA
+    pattern: .*
+  args:
+    tags:
+      ha-mode: all
+  run_once: true
+  delegate_to: "{{ first_node_ip }}"

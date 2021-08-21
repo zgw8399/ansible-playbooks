@@ -1,0 +1,8 @@
+- import_tasks: ubuntu.yml
+- import_tasks: modprobe.yml
+- import_tasks: hostname.yml
+- import_tasks: hosts.yml
+- import_tasks: chrony.yml
+- import_tasks: ssh.yml 
+- import_tasks: swap.yml
+- import_tasks: sysctl.yml

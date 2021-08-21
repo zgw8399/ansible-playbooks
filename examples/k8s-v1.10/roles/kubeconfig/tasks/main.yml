@@ -1,0 +1,205 @@
+- name: "Get kubectl binary file"
+  get_url:
+    url: "{{ kube_url }}/{{ kube_release }}/{{ item }}"
+    dest: "{{ kube_install_path }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - kubectl
+
+- name: "Create some dirs"
+  file:
+    name: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ kube_pki_dir }}"
+
+- name: "Generate bootstrap token.csv file"
+  template:
+    src: token.csv.j2
+    dest: "{{ kube_conf_dir }}/token.csv"
+
+- name: "Generate bootstrap kubeconfig"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../bootstrap.conf && \
+    kubectl config set-credentials \
+      kubelet-bootstrap \
+      --token={{ bootstrap_token }} \
+      --kubeconfig=../bootstrap.conf && \
+    kubectl config set-context \
+      default \
+      --cluster=kubernetes \
+      --user=kubelet-bootstrap \
+      --kubeconfig=../bootstrap.conf && \
+    kubectl config use-context \
+      default \
+      --kubeconfig=../bootstrap.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../bootstrap.conf
+
+- name: "Generate admin kubeconfig"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../admin.conf && \
+    kubectl config set-credentials \
+      kubernetes-admin \
+      --client-certificate={{ cfssl_certs_dir }}/admin.pem \
+      --client-key={{ cfssl_certs_dir }}/admin-key.pem \
+      --embed-certs=true \
+      --kubeconfig=../admin.conf && \
+    kubectl config set-context \
+      kubernetes-admin@kubernetes \
+      --cluster=kubernetes \
+      --user=kubernetes-admin \
+      --kubeconfig=../admin.conf && \
+    kubectl config use-context \
+      kubernetes-admin@kubernetes \
+      --kubeconfig=../admin.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../admin.conf
+
+- name: "Generate controller-manager kubeconfig"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../controller-manager.conf && \
+    kubectl config set-credentials \
+      system:kube-controller-manager \
+      --client-certificate={{ cfssl_certs_dir }}/controller-manager.pem \
+      --client-key={{ cfssl_certs_dir }}/controller-manager-key.pem \
+      --embed-certs=true \
+      --kubeconfig=../controller-manager.conf && \
+    kubectl config set-context \
+      system:kube-controller-manager@kubernetes \
+      --cluster=kubernetes \
+      --user=system:kube-controller-manager \
+      --kubeconfig=../controller-manager.conf && \
+    kubectl config use-context \
+      system:kube-controller-manager@kubernetes \
+      --kubeconfig=../controller-manager.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../controller-manager.conf
+
+- name: "Generate scheduler"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../scheduler.conf && \
+    kubectl config set-credentials \
+      system:kube-scheduler \
+      --client-certificate={{ cfssl_certs_dir }}/scheduler.pem \
+      --client-key={{ cfssl_certs_dir }}/scheduler-key.pem \
+      --embed-certs=true \
+      --kubeconfig=../scheduler.conf && \
+    kubectl config set-context \
+      system:kube-scheduler@kubernetes \
+      --cluster=kubernetes \
+      --user=system:kube-scheduler \
+      --kubeconfig=../scheduler.conf && \
+    kubectl config use-context \
+      system:kube-scheduler@kubernetes \
+      --kubeconfig=../scheduler.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../scheduler.conf
+
+- name: "Generate kubelet kubeconfig for masters"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../{{ item }}-kubelet.conf && \
+    kubectl config set-credentials \
+      system:node:{{ item }} \
+      --client-certificate={{ cfssl_certs_dir }}/{{ item }}-kubelet.pem \
+      --client-key={{ cfssl_certs_dir }}/{{ item }}-kubelet-key.pem \
+      --embed-certs=true \
+      --kubeconfig=../{{ item }}-kubelet.conf && \
+    kubectl config set-context \
+      system:node:{{ item }}@kubernetes \
+      --cluster=kubernetes \
+      --user=system:node:{{ item }} \
+      --kubeconfig=../{{ item }}-kubelet.conf && \
+    kubectl config use-context \
+      system:node:{{ item }}@kubernetes \
+      --kubeconfig=../{{ item }}-kubelet.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../{{ item }}-kubelet.conf
+  with_items:
+    - "{{ kube_master_1 }}"
+    - "{{ kube_master_2 }}"
+    - "{{ kube_master_3 }}"
+
+- name: "Generate service account key"
+  shell: |
+    openssl genrsa \
+      -out sa.key \
+      2048 && \
+    openssl rsa \
+      -in sa.key \
+      -pubout \
+      -out sa.pub
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: sa.pub
+
+- name: "Generate proxy kubeconfig"
+  shell: |
+    kubectl config set-cluster \
+      kubernetes \
+      --certificate-authority={{ cfssl_certs_dir }}/ca.pem \
+      --embed-certs=true \
+      --server={{ kube_apiserver }} \
+      --kubeconfig=../kube-proxy.conf && \
+    kubectl config set-credentials \
+      system:kube-proxy \
+      --client-key={{ cfssl_certs_dir }}/kube-proxy-key.pem \
+      --client-certificate={{ cfssl_certs_dir }}/kube-proxy.pem \
+      --embed-certs=true \
+      --kubeconfig=../kube-proxy.conf && \
+    kubectl config set-context \
+      system:kube-proxy@kubernetes \
+      --cluster=kubernetes \
+      --user=system:kube-proxy \
+      --kubeconfig=../kube-proxy.conf && \
+    kubectl config use-context \
+      system:kube-proxy@kubernetes \
+      --kubeconfig=../kube-proxy.conf
+  args:
+    chdir: "{{ kube_pki_dir }}"
+    creates: ../kube-proxy.conf
+
+- name: "Change file mode"
+  file:
+    path: "{{ kube_conf_dir }}/{{ item }}"
+    mode: 0644
+  with_items:
+    - admin.conf
+    - bootstrap.conf
+    - controller-manager.conf
+    - "{{ kube_master_1 }}-kubelet.conf"
+    - "{{ kube_master_2 }}-kubelet.conf"
+    - "{{ kube_master_3 }}-kubelet.conf"
+    - kube-proxy.conf
+    - scheduler.conf
+    - pki/sa.key

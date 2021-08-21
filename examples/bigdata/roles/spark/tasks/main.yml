@@ -1,0 +1,29 @@
+- import_tasks: install.yml
+
+- name: "Config env vars for spark"
+  template:
+    src: spark.sh.j2
+    dest: /etc/profile.d/spark.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Config spark"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ spark_conf_dir }}/{{ item }}"
+    owner: root
+    group: bigdata
+    mode: 0664
+  with_items:
+    - spark-env.sh
+    - spark-defaults.conf
+
+- name: "Put spark jars to hdfs"
+  shell: |
+    su - spark -c "hadoop fs -put {{ spark_home }}/jars/* /{{ spark_yarn_jars_dir }}/"
+    touch put_spark_jars.done
+    exit 0
+  args:
+    chdir: "{{ spark_home }}"
+    creates: put_spark_jars.done

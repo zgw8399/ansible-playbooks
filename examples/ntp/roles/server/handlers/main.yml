@@ -1,0 +1,7 @@
+---
+# handlers for ntp-server role
+#
+- name: restart chrony
+  service: 
+    name=chrony
+    state=restarted

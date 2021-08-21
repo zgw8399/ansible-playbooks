@@ -1,0 +1,5 @@
+---
+# default vars for rabbitmq role
+#
+admin_user: admin
+admin_pass: admin

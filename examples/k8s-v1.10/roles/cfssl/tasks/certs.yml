@@ -1,0 +1,223 @@
+- name: "Create some dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ cfssl_conf_dir }}"
+    - "{{ cfssl_certs_dir }}"
+
+- name: "Copy config file"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ cfssl_conf_dir }}/{{ item }}"
+  with_items:
+    - admin-csr.json
+    - apiserver-csr.json
+    - etcd-ca-config.json
+    - etcd-ca-csr.json
+    - etcd-server-csr.json
+    - front-proxy-ca-csr.json
+    - front-proxy-client-csr.json
+    - k8s-ca-config.json
+    - k8s-ca-csr.json
+    - kube-proxy-csr.json
+    - manager-csr.json
+    - master-1-kubelet-csr.json
+    - master-2-kubelet-csr.json
+    - master-3-kubelet-csr.json
+    - scheduler-csr.json
+
+- name: "Generate CA and Certs for etcd-cluster"
+  shell: |
+    cfssl gencert \
+      -initca \
+      -config="etcd-ca-config.json" \
+      etcd-ca-csr.json | \
+      cfssljson -bare certs/etcd-ca && \
+      touch gen-etcd-ca-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-etcd-ca-certs.done
+
+- name: "Generate etcd certs for kube-apiserver"
+  shell: |
+    cfssl gencert \
+      -ca="certs/etcd-ca.pem" \
+      -ca-key="certs/etcd-ca-key.pem" \
+      -config="etcd-ca-config.json" \
+      -profile="etcd" \
+      etcd-server-csr.json | \
+      cfssljson -bare certs/etcd && \
+      touch gen-etcd-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-etcd-certs.done
+
+- name: "Generate CA and Certs for k8s-cluster"
+  shell: |
+    cfssl gencert \
+      -initca \
+      -config="k8s-ca-config.json" \
+      k8s-ca-csr.json | \
+      cfssljson -bare certs/ca && \
+      touch gen-k8s-ca-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-k8s-ca-certs.done
+
+- name: "Generate certs for kube-apiserver"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      apiserver-csr.json | \
+      cfssljson -bare certs/apiserver && \
+      touch gen-apiserver-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-apiserver-certs.done
+
+- name: "Generate certs for front proxy"
+  shell: |
+    cfssl gencert \
+      -initca \
+      -config="k8s-ca-config.json" \
+      front-proxy-ca-csr.json | \
+      cfssljson -bare certs/front-proxy-ca && \
+      touch gen-front-proxy-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-front-proxy-certs.done
+
+- name: "Generate certs for front proxy client"
+  shell: |
+    cfssl gencert \
+      -ca="certs/front-proxy-ca.pem" \
+      -ca-key="certs/front-proxy-ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      front-proxy-client-csr.json | \
+      cfssljson -bare certs/front-proxy-client && \
+      touch gen-front-proxy-client-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-front-proxy-client-certs.done
+
+- name: "Generate certs for admin"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      admin-csr.json | \
+      cfssljson -bare certs/admin && \
+      touch gen-admin-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-admin-certs.done
+
+- name: "Generate certs for kube-controller-manager"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      manager-csr.json | \
+      cfssljson -bare certs/controller-manager && \
+      touch gen-controller-manager-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-controller-manager-certs.done
+
+- name: "Generate certs for kube-scheduler"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      scheduler-csr.json | \
+      cfssljson -bare certs/scheduler && \
+      touch gen-scheduler-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-scheduler-certs.done
+
+- name: "Generate certs for master-1 kubelet"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      master-1-kubelet-csr.json | \
+      cfssljson -bare certs/{{ kube_master_1 }}-kubelet && \
+      touch gen-master-1-kubelet-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-master-1-kubelet-certs.done
+
+- name: "Generate certs for master-2 kubelet"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      master-2-kubelet-csr.json | \
+      cfssljson -bare certs/{{ kube_master_2 }}-kubelet && \
+      touch gen-master-2-kubelet-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-master-2-kubelet-certs.done
+
+- name: "Generate certs for master-3 kubelet"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      master-3-kubelet-csr.json | \
+      cfssljson -bare certs/{{ kube_master_3 }}-kubelet && \
+      touch gen-master-3-kubelet-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-master-3-kubelet-certs.done
+
+- name: "Generate certs for kube-proxy"
+  shell: |
+    cfssl gencert \
+      -ca="certs/ca.pem" \
+      -ca-key="certs/ca-key.pem" \
+      -config="k8s-ca-config.json" \
+      -profile="kubernetes" \
+      kube-proxy-csr.json | \
+      cfssljson -bare certs/kube-proxy && \
+      touch gen-kube-proxy-certs.done
+  args:
+    chdir: "{{ cfssl_conf_dir }}"
+    creates: gen-kube-proxy-certs.done
+
+- name: "Change file mode"
+  file:
+    path: "{{ cfssl_certs_dir }}/{{ item }}"
+    mode: 0644
+  with_items:
+    - admin-key.pem
+    - apiserver-key.pem
+    - ca-key.pem
+    - controller-manager-key.pem
+    - etcd-ca-key.pem
+    - etcd-key.pem
+    - front-proxy-ca-key.pem
+    - front-proxy-client-key.pem
+    - kube-proxy-key.pem
+    - "{{ kube_master_1 }}-kubelet-key.pem"
+    - "{{ kube_master_2 }}-kubelet-key.pem"
+    - "{{ kube_master_3 }}-kubelet-key.pem"
+    - scheduler-key.pem

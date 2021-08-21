@@ -1,0 +1,19 @@
+---
+- hosts: testserver
+  
+  vars:
+    - ansible_ssh_user: keda
+    - ansible_ssh_pass: keda
+    - local_user: keda
+
+  tasks:
+    - name: "Test for login"
+      ping:
+
+    - name: "Set the authorization key"
+      authorized_key:
+        user: "{{ ansible_ssh_user }}"
+        state: present
+        key: "{{ lookup('file', '/home/{{ local_user }}/.ssh/id_rsa.pub') }}"
+        path: "/home/{{ ansible_ssh_user }}/.ssh/authorized_keys"
+        manage_dir: false

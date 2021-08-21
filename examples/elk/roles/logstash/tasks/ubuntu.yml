@@ -1,0 +1,11 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install logstash"
+  apt:
+    deb: "{{ logstash_deb_url }}"

@@ -1,0 +1,13 @@
+---
+- hosts:
+    - 10.9.36.178
+    - 10.9.36.179
+    - 10.9.36.180
+  become: yes
+  pre_tasks:
+    - name: "Update apt cache"
+      apt: 
+        update_cache=yes
+        cache_valid_time=3600
+  roles:
+    - rabbitmq

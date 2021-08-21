@@ -1,0 +1,74 @@
+- name: "Create dir for yarn app mapreduce am staging"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ yarn_app_mapreduce_am_staging_dir }}"
+    su - hdfs -c "hadoop fs -chown -R yarn:bigdata {{ yarn_app_mapreduce_am_staging_dir }}"
+    touch create_yarn_app_mapreduce_am_staging_dir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_yarn_app_mapreduce_am_staging_dir.done
+
+- name: "Create dir for mapreduce jobhistory"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ mapreduce_jobhistory_dir }}"
+    su - hdfs -c "hadoop fs -chown -R yarn:bigdata {{ mapreduce_jobhistory_dir }}"
+    touch create_mapreduce_jobhistory_dir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_mapreduce_jobhistory_dir.done
+
+- name: "Create dir for yarn nodemanager remote app log"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ yarn_nodemanager_remote_app_log_dir }}"
+    su - hdfs -c "hadoop fs -chown -R yarn:bigdata {{ yarn_nodemanager_remote_app_log_dir }}"
+    touch create_yarn_nodemanager_remote_app_log_dir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_yarn_nodemanager_remote_app_log_dir.done
+
+- name: "Create some dirs for bigdata users"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p /user/{{ item }}"
+    su - hdfs -c "hadoop fs -chown -R {{ item }}:bigdata /user/{{ item }}"
+    touch "create_{{ item }}_user_dir.done"
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: "create_{{ item }}_user_dir.done"
+  with_items:
+    - hdfs
+    - yarn
+    - hbase
+    - spark
+
+- name: "Create rootdir for hbase"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ hbase_rootdir }}"
+    su - hdfs -c "hadoop fs -chown -R hbase:bigdata {{ hbase_rootdir }}"
+    touch create_hbase_rootdir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_hbase_rootdir.done
+
+- name: "Create eventlog dir for spark"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ spark_eventlog_dir }}"
+    su - hdfs -c "hadoop fs -chown -R spark:bigdata {{ spark_eventlog_dir }}"
+    touch create_spark_eventlog_dir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_spark_eventlog_dir.done
+
+- name: "Create jars dir for spark"
+  shell: |
+    su - hdfs -c "hadoop fs -mkdir -p {{ spark_yarn_jars_dir }}"
+    su - hdfs -c "hadoop fs -chown -R spark:bigdata {{ spark_yarn_jars_dir }}"
+    touch create_spark_jars_dir.done
+    exit 0
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: create_spark_jars_dir.done

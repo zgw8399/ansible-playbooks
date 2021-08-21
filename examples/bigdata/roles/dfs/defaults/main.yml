@@ -1,0 +1,13 @@
+---
+# default vars file for dfs role
+#
+hadoop_home: /usr/local/hadoop 
+#
+yarn_app_mapreduce_am_staging_dir: /tmp/hadoop-yarn/staging
+mapreduce_jobhistory_dir: /mr-history
+yarn_nodemanager_remote_app_log_dir: /tmp/logs
+#
+hbase_rootdir: /hbase
+#
+spark_eventlog_dir: /spark-logs
+spark_yarn_jars_dir: /spark-jars

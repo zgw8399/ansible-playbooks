@@ -1,0 +1,14 @@
+---
+# default vars for mariadb role
+#
+# database name
+dbname: testdb
+
+# database username
+dbuser: test
+
+# database userpassword
+dbpassword: test
+
+# remote host
+remote_access_host: '%'

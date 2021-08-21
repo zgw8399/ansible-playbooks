@@ -1,0 +1,11 @@
+---
+# default vars for zabbix-proxy role
+#
+zabbix_server_address: 10.9.36.21
+proxy_mode: 0
+proxy_hostname: zabbix_proxy_177
+proxy_dbhost: localhost
+proxy_dbname: zabbix_proxy
+proxy_dbuser: zabbix
+proxy_dbpassword: zabbix
+datafiles_path: /usr/share/zabbix-proxy-mysql

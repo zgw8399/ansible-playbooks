@@ -1,0 +1,48 @@
+- name: "Get secret.xml file"
+  template:
+    src: secret.xml.j2
+    dest: /etc/nova/secret.xml
+
+- name: "Define secret"
+  shell: |
+    virsh secret-define --file secret.xml && \
+    virsh secret-set-value --secret {{ secret_uuid }} --base64 {{ ceph_client_admin_key }} && \
+    touch define_secret.done
+  args:
+    chdir: /etc/nova
+    creates: define_secret.done
+
+- name: "Get ceph.conf file"
+  template:
+    src: "{{ item }}"
+    dest: "/etc/ceph/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - ceph.conf
+    - ceph.client.admin.keyring
+
+- name: "Create some dirs"
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: libvirt-qemu
+    group: libvirt
+    recurse: yes
+  with_items:
+    - /var/run/ceph/guests
+    - /var/log/qemu
+
+- name: "Configure nova-compute"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/nova/{{ item }}"
+    owner: root
+    group: nova
+    mode: '0640'
+  with_items:
+    - nova.conf
+    - nova-compute.conf
+  notify:
+    - restart nova-compute

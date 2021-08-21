@@ -1,0 +1,10 @@
+---
+# default vars for database role
+#
+remote_access_hosts: "%"
+#
+keystone_dbpass: keystone
+glance_dbpass: glance
+nova_dbpass: nova
+neutron_dbpass: neutron
+cinder_dbpass: cinder

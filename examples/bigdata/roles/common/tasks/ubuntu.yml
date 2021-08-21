@@ -1,0 +1,16 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Installing software"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - rsync
+    - chrony
+    - openjdk-8-jdk

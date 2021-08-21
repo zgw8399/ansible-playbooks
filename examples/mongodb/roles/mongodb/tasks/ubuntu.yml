@@ -1,0 +1,15 @@
+- name: "Get dep for apt repo-management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install mongodb"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - mongodb
+    - python-pymongo

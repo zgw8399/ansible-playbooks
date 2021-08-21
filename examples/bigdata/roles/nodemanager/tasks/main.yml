@@ -1,0 +1,5 @@
+- name: "Start NodeManager daemon"
+  shell: "su - yarn -c 'yarn-daemon.sh start nodemanager' && touch start-nodemanager.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-nodemanager.done

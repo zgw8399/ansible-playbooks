@@ -1,0 +1,6 @@
+check system $HOST
+if loadavg (1min) > {{ loadavg_1min }} then alert
+if loadavg (5min) > {{ loadavg_5min }} then alert
+if cpu usage > {{ cpu_usage }} for 10 cycles then alert
+if memory usage > {{ memory_usage }} then alert
+if swap usage > {{ swap_usage }} then alert

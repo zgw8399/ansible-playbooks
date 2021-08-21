@@ -1,0 +1,42 @@
+- import_tasks: install.yml
+
+- name: "Config env vars for hbase"
+  template:
+    src: hbase.sh.j2
+    dest: /etc/profile.d/hbase.sh
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Config hbase"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ hbase_conf_dir }}/{{ item.dest }}"
+    owner: root
+    group: bigdata
+    mode: 0664
+  with_items:
+    - { src: "hbase-env.sh.j2", dest: "hbase-env.sh" }
+    - { src: "hbase-site.xml.j2", dest: "hbase-site.xml" }
+    - { src: "regionservers.j2", dest: "regionservers" }
+    - { src: "backup-masters.j2", dest: "backup-masters" }
+  changed_when: false
+
+- name: "Add hdfs client config to hbase"
+  file:
+    src: "{{ hadoop_conf_dir }}/{{ item }}"
+    dest: "{{ hbase_conf_dir }}/{{ item }}"
+    state: link
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml
+
+- name: "Create some dirs"
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: bigdata
+    mode: 0775
+    state: directory
+  with_items:
+    - "{{ hbase_zk_datadir }}"

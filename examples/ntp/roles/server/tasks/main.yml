@@ -1,0 +1,23 @@
+- import_tasks: ubuntu.yml
+
+- name: "Remove default ntp-pool"
+  lineinfile:
+    path: /etc/chrony/chrony.conf
+    regexp: "^{{ item }}"
+    line: "#{{ item }}"
+    backrefs: yes
+  with_items:
+    - pool ntp.ubuntu.com
+    - pool 0.ubuntu.pool.ntp.org
+    - pool 1.ubuntu.pool.ntp.org
+    - pool 2.ubuntu.pool.ntp.org
+  notify: restart chrony
+
+- name: "Add ntp-pool"
+  lineinfile:
+    path: /etc/chrony/chrony.conf
+    regexp: "^pool {{ item }}"
+    insertafter: "^#pool 2"
+    line: "pool {{ item }} iburst maxsources 2"
+  with_items: "{{ ntp_pools }}"
+  notify: restart chrony

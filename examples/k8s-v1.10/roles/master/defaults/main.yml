@@ -1,0 +1,68 @@
+---
+# default vars for master role
+#
+cfssl_certs_dir: /etc/cfssl/certs
+kube_conf_dir: /etc/kubernetes
+kube_pki_dir: /etc/kubernetes/pki
+kube_manifests_dir: /etc/kubernetes/manifests
+kube_addons_dir: /etc/kubernetes/addons
+kubelet_service_conf_dir: /etc/systemd/system/kubelet.service.d
+kubelet_data_dir: /var/lib/kubelet
+kube_log_dir: /var/log/kubernetes
+kubectl_conf_dir: ~/.kube
+kube_apiserver: https://10.9.36.21:6443
+# generate command: "head -c 32 /dev/urandom | base64"
+encrypt_key: ivska3BY1hjdkPB6d+pxhq7ItyQG78nE2I3oDyF/xiU=
+
+log_level: 0
+
+# vars for registry
+registry_server: registry.cn-hangzhou.aliyuncs.com
+project: varden
+kube_release: v1.10.13
+
+# vars for apiserver
+apiserver_image: kube-apiserver-amd64
+apiserver_bind_address: 0.0.0.0
+apiserver_secure_port: 6443
+apiserver_insecure_port: 0
+service_cluster_ip_range: 10.96.0.0/12
+service_node_port_range: 30000-32767
+etcd_servers: https://10.9.36.21:2379,https://10.9.36.22:2379,https://10.9.36.23:2379
+apiserver_disable_admission: PersistentVolumeLabel
+apiserver_enable_admission: NodeRestriction
+apiserver_authorization_mode: Node,RBAC
+apiserver_allowed_names: front-proxy-client,aggregator
+
+# vars for controller-manager
+controller_manager_image: kube-controller-manager-amd64
+pod_network_cidr: 10.244.0.0/16
+
+# vars for scheduler
+scheduler_image: kube-scheduler-amd64
+
+# vars for kubelet
+kubelet_bind_address: 0.0.0.0
+kubelet_bind_port: 10250
+pod_infra_container_image: pause:3.1
+cni_conf_dir: /etc/cni/net.d
+cni_bin_dir: /opt/cni/bin
+cluster_dns: 10.96.0.10
+cluster_domain: cluster.local
+cadvisor_port: 0
+kube_bin_dir: /usr/local/bin
+
+# vars for proxy
+proxy_image: kube-proxy-amd64
+proxy_mode: iptables
+
+# vars for dns
+kube_dns_release: 1.14.10
+kube_dns_image: k8s-dns-kube-dns-amd64
+dnsmasq_nanny_image: k8s-dns-dnsmasq-nanny-amd64
+dns_sidecar_image: k8s-dns-sidecar-amd64
+
+# vars for network
+flannel_release: flannel:v0.11.0-amd64
+flannel_image: flannel
+flannel_iface: ens33

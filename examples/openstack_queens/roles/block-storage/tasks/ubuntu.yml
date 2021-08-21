@@ -1,0 +1,19 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - chrony
+    - cinder-volume
+    - ceph-common
+    - python-rbd
+    - python-rados

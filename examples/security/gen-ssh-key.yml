@@ -1,0 +1,15 @@
+---
+- hosts: testserver
+  
+  become: yes
+
+  vars:
+    - user_mame: hadoop
+
+  tasks:
+    - name: "Gen SSH key for user"
+      user:
+        name: "{{ user_mame }}"
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa

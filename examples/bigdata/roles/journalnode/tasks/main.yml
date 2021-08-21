@@ -1,0 +1,5 @@
+- name: "Start JournalNode daemon"
+  shell: "su - hdfs -c 'hadoop-daemon.sh start journalnode' && touch start-journalnode.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-journalnode.done

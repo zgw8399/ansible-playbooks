@@ -1,0 +1,16 @@
+set mailserver {{ mail_server }}
+    username "{{ username }}" password "{{ password }}"
+set alert {{ alert_user }}
+set mail-format {
+    from: {{ from }}
+    subject: {{ subject }} -- [$SERVICE] $EVENT
+    message:
+[$SERVICE] $EVENT
+---
+Date: $DATE
+Action: $ACTION
+Host: $HOST
+Description: $DESCRIPTION
+---
+{{ signarute }}
+}

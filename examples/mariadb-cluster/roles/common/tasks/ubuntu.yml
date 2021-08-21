@@ -1,0 +1,20 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install mysql_db module"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+
+- name: "Install xinetd"
+  apt:
+    name=xinetd
+    state=present

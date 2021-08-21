@@ -1,0 +1,5 @@
+127.0.0.1  localhost
+##
+{% for id in range(21,24) %}
+10.9.36.{{ id }}  {{ hostname_prefix }}-{{ id }}
+{% endfor %}

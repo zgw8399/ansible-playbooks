@@ -1,0 +1,21 @@
+---
+- hosts: testserver
+
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+  tasks:
+    - name: "Config security for ssh"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "{{ item }}"
+      with_items:
+        - PermitRootLogin no
+        - PasswordAuthentication no
+        - Port 2022
+      # notify: restart ssh

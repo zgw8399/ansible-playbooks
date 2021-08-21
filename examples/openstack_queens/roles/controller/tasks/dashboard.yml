@@ -1,0 +1,9 @@
+- name: "Configure dashboard"
+  template:
+    src: local_settings.py.j2
+    dest: /etc/openstack-dashboard/local_settings.py
+    owner: root
+    group: horizon
+    mode: '0640'
+  notify:
+    - reloaded apache2

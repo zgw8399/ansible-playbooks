@@ -1,0 +1,14 @@
+---
+# handlers for block-storage role
+#
+- name: restart chrony
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: chrony
+
+- name: restart cinder-volume
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: cinder-volume

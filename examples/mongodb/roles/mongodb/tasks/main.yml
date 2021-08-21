@@ -1,0 +1,11 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config mongodb"
+  lineinfile:
+    path: /etc/mongodb.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: "^bind_ip", line: "bind_ip = {{ ansible_default_ipv4.address }}" }
+  notify: restart mongodb

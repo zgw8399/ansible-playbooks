@@ -1,0 +1,4 @@
+---
+# default vars for manager role
+#
+manager_advertise_addr: 192.168.22.11

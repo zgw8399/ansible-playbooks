@@ -1,0 +1,5 @@
+- name: "Format the NameNode"
+  shell: "su - hdfs -c 'hdfs namenode -format' && touch format-namenode.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: format-namenode.done

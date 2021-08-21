@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+  labels:
+    k8s-app: kube-proxy
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+  labels:
+    k8s-app: kube-proxy
+    kubernetes.io/cluster-service: "true"
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-proxy
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-proxy
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      serviceAccountName: kube-proxy
+      hostNetwork: true
+      containers:
+      - name: kube-proxy
+        image: {{ registry_server }}/{{ project }}/{{ proxy_image }}:{{ kube_release }}
+        command:
+        - kube-proxy
+        - --v={{ log_level }}
+        - --logtostderr=true
+        - --kubeconfig=/run/kube-proxy.conf
+        - --cluster-cidr={{ pod_network_cidr }}
+        - --proxy-mode={{ proxy_mode }}
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /run/kube-proxy.conf
+          name: kubeconfig
+          readOnly: true
+        - mountPath: {{ kube_pki_dir }}
+          name: k8s-certs
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: {{ kube_conf_dir }}/kube-proxy.conf
+          type: FileOrCreate
+        name: kubeconfig
+      - hostPath:
+          path: {{ kube_pki_dir }}
+          type: DirectoryOrCreate
+        name: k8s-certs

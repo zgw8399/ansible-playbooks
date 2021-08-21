@@ -1,0 +1,11 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config redis"
+  lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: "^bind", line: "bind 0.0.0.0" }
+  notify: restart redis

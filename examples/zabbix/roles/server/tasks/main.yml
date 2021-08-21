@@ -1,0 +1,23 @@
+- import_tasks: ubuntu.yml
+
+- import_tasks: mysql.yml
+
+- name: "Config zabbix-server"
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-server
+    - restart apache2
+
+- name: "Config zabbix-web-gui"
+  template:
+    src: zabbix-frontend-php.conf.j2
+    dest: /etc/apache2/conf-enabled/zabbix-frontend-php.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache2

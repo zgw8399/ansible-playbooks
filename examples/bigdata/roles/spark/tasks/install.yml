@@ -1,0 +1,27 @@
+- name: "Get binary installation package"
+  get_url:
+    url: "{{ spark_url }}/spark-{{ spark_version }}-bin-hadoop2.7.tgz"
+    dest: "{{ spark_install_path }}/spark-{{ spark_version }}-bin-hadoop2.7.tgz"
+    mode: 0440
+
+- name: "Extract the binary package"
+  shell: "if [ -f spark-{{ spark_version }}-bin-hadoop2.7.tgz ]; then tar -zxf spark-{{ spark_version }}-bin-hadoop2.7.tgz; fi && touch extract-spark.done"
+  args:
+    chdir: "{{ spark_install_path }}"
+    creates: extract-spark.done
+
+- name: "Create a link directory"
+  file:
+    src: "{{ spark_install_path }}/spark-{{ spark_version }}-bin-hadoop2.7"
+    dest: "{{ spark_home }}"
+    state: link
+
+- name: "Set directory permissions"
+  file:
+    path: "{{ spark_install_path }}/spark-{{ spark_version }}-bin-hadoop2.7"
+    owner: root
+    group: bigdata
+    state: directory
+    mode: 0775
+    recurse: yes
+  changed_when: false

@@ -1,0 +1,20 @@
+{
+  "CN": "system:node:{{ kube_master_2 }}",
+  "hosts": [
+    "{{ kube_master_2 }}",
+    "{{ kube_master_2_ip }}"
+  ],
+  "key": {
+    "algo": "rsa",
+    "size": 2048
+  },
+  "names": [
+    {
+      "C": "CN",
+      "L": "ShenZhen",
+      "ST": "ShenZhen",
+      "O": "system:nodes",
+      "OU": "Kubernetes-manual"
+    }
+  ]
+}

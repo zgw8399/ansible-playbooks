@@ -1,0 +1,32 @@
+- name: "Set the authorization key for all nodes"
+  authorized_key:
+    user: "{{ item }}"
+    state: present
+    key: "{{ lookup('file', 'id_rsa.pub') }}"
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+    manage_dir: false
+  with_items: "{{ bigdata_users }}"
+
+- name: "Copy the id_rsa private key file to all nodes"
+  copy:
+    src: id_rsa
+    dest: "/home/{{ item }}/.ssh/id_rsa"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: 0600
+  with_items: "{{ bigdata_users }}"
+
+- name: "Cancel the ssh client to receive the key prompt"
+  lineinfile:
+    path: /etc/ssh/ssh_config
+    regexp: '^StrictHostKeyChecking'
+    insertafter: '^#   StrictHostKeyChecking'
+    line: 'StrictHostKeyChecking no'
+
+- name: "Config sshd"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UseDNS'
+    insertafter: '^#UseDNS'
+    line: 'UseDNS no'
+  notify: restart ssh

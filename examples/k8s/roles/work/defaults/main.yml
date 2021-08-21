@@ -1,0 +1,29 @@
+---
+# default vars for master role
+#
+cfssl_certs_dir: /etc/cfssl/certs
+
+kube_conf_dir: /etc/kubernetes
+kube_pki_dir: /etc/kubernetes/pki
+kube_manifests_dir: /etc/kubernetes/manifests
+kubelet_service_conf_dir: /etc/systemd/system/kubelet.service.d
+kubelet_data_dir: /var/lib/kubelet
+kube_log_dir: /var/log/kubernetes
+
+log_level: 0
+
+# vars for image
+registry_server: registry.cn-hangzhou.aliyuncs.com
+project: varden
+kube_release: v1.10.13
+
+# vars for kubelet
+kube_bin_dir: /usr/local/bin
+cni_conf_dir: /etc/cni/net.d
+cni_bin_dir: /opt/cni/bin
+kubelet_bind_address: 0.0.0.0
+kubelet_bind_port: 10250
+cluster_dns: 10.96.0.10
+cluster_domain: cluster.local
+pod_infra_container_image: pause:3.1
+cadvisor_port: 0

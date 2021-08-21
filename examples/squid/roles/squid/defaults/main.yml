@@ -1,0 +1,5 @@
+---
+# default vars for squid role
+#
+proxy_user_name: keda
+proxy_user_password: keda

@@ -1,0 +1,2 @@
+- import_playbook: haproxy.yml
+- import_playbook: keepalived.yml

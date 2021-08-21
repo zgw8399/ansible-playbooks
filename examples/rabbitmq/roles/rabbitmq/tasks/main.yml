@@ -1,0 +1,38 @@
+- import_tasks: ubuntu.yml
+
+- name: "Enable plugins"
+  shell: "rabbitmq-plugins enable {{ item }}"
+  with_items:
+    - rabbitmq_management
+  notify: restart rabbitmq
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Create user and password"
+  shell: "rabbitmqctl add_user {{ admin_user }} {{ admin_pass }}"
+  notify: restart rabbitmq
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Account join manager"
+  shell: "rabbitmqctl set_user_tags {{ admin_user }} administrator"
+  notify: restart rabbitmq
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Give resource management rights"
+  shell: "rabbitmqctl set_permissions -p / {{ admin_user }} '.*' '.*' '.*'"
+  notify: restart rabbitmq
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Config ha rule"
+  rabbitmq_policy:
+    name: HA
+    pattern: .*
+  args:
+    tags:
+      ha-mode: all
+  notify: restart rabbitmq
+  ignore_errors: yes
+  changed_when: false

@@ -1,0 +1,8 @@
+---
+# default vars for rabbitmq role
+#
+erlang_cookie: QJPTXPIJRCOVPBKIQTFU
+first_node_hostname: controller-1
+first_node_ip: 10.9.36.178
+admin_user: admin
+admin_pass: admin

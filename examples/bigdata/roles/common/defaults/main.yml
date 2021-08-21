@@ -1,0 +1,53 @@
+---
+# default vars for common role
+#
+# vars for hostname
+hostname_prefix: bigdata
+
+# vars for users
+bigdata_group_name: bigdata
+bigdata_group_id: 2000
+user_shell: /bin/bash
+
+hdfs_user: {
+  user_name: "hdfs",
+  user_id: "1001",
+  user_password: "$6$pwCBVdhr7M.uhC81$Aqy8oG1eEyiosGLiB7egTQXjm985yGvK/ZO3NCOabv8vpJwYyf6/JW1RckD4WGdH4hUS3KpSzn6lWPe1vEUXD/",
+  user_comment: "HDFS"
+}
+
+yarn_user: {
+  user_name: "yarn",
+  user_id: "1002",
+  user_password: "$6$SeM/dZak1t$RFTtF3jx1P6pQIUValX9bfkG1SFNplXCZ5DAipCPTbx9eUAYKg9IuLlPVZEcoDZQso2dYptvGzvVil0kdHOc5/",
+  user_comment: "Yarn"
+}
+
+hbase_user: {
+  user_name: "hbase",
+  user_id: "1003",
+  user_password: "$6$eUYyEbzD$md7fBy2ES2m3mtJPCfIUROWsaUFmP0FS6mwvFjsBYpdhr.TzHsfEA9OFRy0rvMkh.U7iPCmwudyQQmNaVH51s.",
+  user_comment: "HBase"
+}
+
+spark_user: {
+  user_name: "spark",
+  user_id: "1004",
+  user_password: "$6$h8Oi7RSth.KlU$72gtNGa0cAbPQ4dQaZhPB6z1JwEIXvWgisQqn7Da/Kx.6W2BV4nXPY.jc0g7vMgSO/xbtwBvAv2ixaBl7DPcA0",
+  user_comment: "Spark"
+}
+
+# vars for ntp
+ntp_servers:
+  - 10.9.36.10
+  - 10.9.40.35
+
+# vars for java
+java_home: /usr/lib/jvm/java-8-openjdk-amd64
+
+# vars for ssh
+bigdata_users:
+  - hdfs
+  - yarn
+  - hbase
+  - spark

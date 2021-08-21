@@ -1,0 +1,9 @@
+- import_tasks: ubuntu.yml
+
+- name: "Batch generation of host entries"
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644

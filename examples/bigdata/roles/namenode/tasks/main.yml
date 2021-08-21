@@ -1,0 +1,13 @@
+- name: "Start the active NameNode daemon"
+  shell: "su - hdfs -c 'hadoop-daemon.sh start namenode' && touch start-namenode.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-namenode.done
+  when: hadoop_role == "active"
+
+- name: "Start the standby NameNode daemon"
+  shell: "su - hdfs -c 'hdfs namenode -bootstrapStandby; hadoop-daemon.sh start namenode' && touch start-namenode.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-namenode.done
+  when: hadoop_role == "standby"

@@ -1,0 +1,18 @@
+- import_tasks: ubuntu.yml
+
+- name: "Create dirs for export"
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items: "{{ export_dirs }}"
+  notify: reload nfs
+
+- name: "Add config for dirs"
+  lineinfile:
+    path: /etc/exports
+    regexp: "^{{ item }}"
+    insertafter: EOF
+    line: "{{ item }}  *(rw,sync,no_root_squash,no_subtree_check)"
+  with_items: "{{ export_dirs }}"
+  notify: reload nfs

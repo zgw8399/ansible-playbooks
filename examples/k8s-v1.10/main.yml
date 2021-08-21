@@ -1,0 +1,9 @@
+---
+- import_playbook: common.yml
+- import_playbook: docker.yml
+- import_playbook: cfssl.yml
+- import_playbook: etcd.yml
+- import_playbook: k8s.yml
+- import_playbook: generate-kubeconfig.yml
+- import_playbook: master.yml
+- import_playbook: node.yml

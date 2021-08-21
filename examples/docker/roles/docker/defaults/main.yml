@@ -1,0 +1,13 @@
+---
+# default vars for docker role
+#
+# vars for install
+#
+lsb_release: bionic
+#
+# vars for docker
+#
+insecure_registries: 0.0.0.0/0
+registry_mirrors: https://xq8387ev.mirror.aliyuncs.com
+data_root: /var/lib/docker
+storage_driver: overlay2

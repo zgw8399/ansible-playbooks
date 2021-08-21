@@ -1,0 +1,7 @@
+---
+# handlers for squid role
+#
+- name: restart squid
+  service: 
+    name=squid
+    state=restarted

@@ -1,0 +1,4 @@
+---
+# default vars for filebeat role
+#
+filebeat_deb_url: http://10.9.36.96/downloads/ELK/filebeat-7.0.0-amd64.deb

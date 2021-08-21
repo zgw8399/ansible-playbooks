@@ -1,0 +1,15 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install openjdk-11-jdk"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - openjdk-11-jdk

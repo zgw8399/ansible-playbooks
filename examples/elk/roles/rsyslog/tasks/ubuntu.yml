@@ -1,0 +1,13 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install rsyslog"
+  apt:
+    name: rsyslog
+    state: present
+    update_cache: yes

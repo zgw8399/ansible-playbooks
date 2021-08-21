@@ -1,0 +1,14 @@
+- name: "Cancel the ssh client to receive the key prompt"
+  lineinfile:
+    path: /etc/ssh/ssh_config
+    regexp: '^StrictHostKeyChecking'
+    insertafter: '^#   StrictHostKeyChecking'
+    line: 'StrictHostKeyChecking no'
+
+- name: "Config sshd"
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^UseDNS'
+    insertafter: '^#UseDNS'
+    line: 'UseDNS no'
+  notify: restart ssh

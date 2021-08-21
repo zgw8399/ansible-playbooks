@@ -1,0 +1,13 @@
+- name: "Configure cinder-volume"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: cinder
+    mode: '0644'
+  with_items:
+    - { src: "cinder.conf.j2", dest: "/etc/cinder/cinder.conf" }
+    - { src: "ceph.conf", dest: "/etc/ceph/ceph.conf" }
+    - { src: "ceph.client.admin.keyring", dest: "/etc/ceph/ceph.client.admin.keyring" }
+  notify:
+    - restart cinder-volume

@@ -1,0 +1,14 @@
+---
+# default vars for zabbix server role
+#
+# Vars for zabbix-server
+#
+datafiles_path: /usr/share/zabbix-server-mysql
+zabbix_timezone: Asia/Shanghai
+#
+# Vars for database
+#
+server_dbhost: localhost
+server_dbname: zabbix
+server_dbuser: zabbix
+server_dbpassword: zabbix

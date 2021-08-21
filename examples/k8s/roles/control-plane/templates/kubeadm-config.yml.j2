@@ -1,0 +1,19 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+imageRepository: {{ image_repo }}
+kubernetesVersion: {{ k8s_version }}
+controlPlaneEndpoint: {{ control_plane_endpoint }}
+networking:
+  serviceSubnet: {{ service_subnet }}
+  podSubnet: {{ pod_subnet }}
+  dnsDomain: {{ dns_domain }}
+clusterName: {{ cluster_name }}
+apiServer:
+  extraArgs:
+    anonymous-auth: "false"
+    enable-admission-plugins: {{ enable_admission_plugins }}
+    audit-log-path: /var/log/audit.log
+controllerManager:
+  extraArgs:
+scheduler:
+  extraArgs:

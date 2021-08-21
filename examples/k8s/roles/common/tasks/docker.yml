@@ -1,0 +1,13 @@
+- name: "Create the dir"
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: "Config docker"
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart docker

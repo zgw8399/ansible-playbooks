@@ -1,0 +1,24 @@
+- import_tasks: ubuntu.yml
+
+- name: "Check if docker is running"
+  stat: path=/var/run/docker.sock
+  register: docker_stat
+  failed_when: not docker_stat.stat.exists
+
+- name: "Determine if the worker node exists"
+  shell: "docker node ls | grep -o {{ ansible_hostname }}"
+  register: result
+  delegate_to: "{{ manager_advertise_addr }}"
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Get the command to join the swarm cluster on the worker node."
+  shell: docker swarm join-token worker | grep token
+  register: token_cmd
+  delegate_to: "{{ manager_advertise_addr }}"
+  when: not result.stdout
+  changed_when: false
+
+- name: "Execute the command to join the swarm cluster on the worker node."
+  shell: "{{ token_cmd.stdout }}"
+  when: token_cmd.stdout

@@ -1,0 +1,5 @@
+- name: "Initialize the HA state in ZooKeeper"
+  shell: "su - hdfs -c 'hdfs zkfc -formatZK' && touch formatzk.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: formatzk.done

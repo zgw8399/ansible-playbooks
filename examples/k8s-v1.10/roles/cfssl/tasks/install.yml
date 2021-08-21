@@ -1,0 +1,8 @@
+- name: "Get binary file"
+  get_url:
+    url: "{{ cfssl_url }}/{{ item.src }}"
+    dest: "{{ cfssl_install_path }}/{{ item.dest }}"
+    mode: 0755
+  with_items:
+    - { src: "{{ cfssl_bin }}", dest: "cfssl" }
+    - { src: "{{ cfssljson_bin }}", dest: "cfssljson" }

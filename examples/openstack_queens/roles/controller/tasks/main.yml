@@ -1,0 +1,9 @@
+- import_tasks: ubuntu.yml
+- import_tasks: chrony.yml
+- import_tasks: memcached.yml
+- import_tasks: keystone.yml
+- import_tasks: glance.yml
+- import_tasks: nova.yml
+- import_tasks: neutron.yml
+- import_tasks: dashboard.yml
+- import_tasks: cinder.yml

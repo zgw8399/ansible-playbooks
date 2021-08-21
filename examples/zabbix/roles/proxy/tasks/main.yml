@@ -1,0 +1,13 @@
+- import_tasks: ubuntu.yml
+
+- import_tasks: mysql.yml
+
+- name: "Config zabbix-proxy"
+  template:
+    src: zabbix_proxy.conf.j2
+    dest: /etc/zabbix/zabbix_proxy.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-proxy

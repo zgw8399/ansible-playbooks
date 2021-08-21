@@ -1,0 +1,50 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Default system properties included when running spark-submit.
+# This is useful for setting default environmental settings.
+
+# Example:
+# spark.master                     spark://master:7077
+# spark.eventLog.enabled           true
+# spark.eventLog.dir               hdfs://namenode:8021/directory
+# spark.serializer                 org.apache.spark.serializer.KryoSerializer
+# spark.driver.memory              5g
+# spark.executor.extraJavaOptions  -XX:+PrintGCDetails -Dkey=value -Dnumbers="one two three"
+#
+spark.master                        {{ spark_master }}
+spark.submit.deployMode             {{ spark_submit_deploymode }}
+#
+spark.driver.cores                  {{ spark_driver_cores }}
+spark.driver.memory                 {{ spark_driver_memory }}
+spark.yarn.driver.memoryOverhead    {{ spark_yarn_driver_memoryoverhead }}
+#
+spark.yarn.am.cores                 {{ spark_yarn_am_cores }}
+spark.yarn.am.memory                {{ spark_yarn_am_memory }}
+spark.yarn.am.memoryOverhead        {{ spark_yarn_am_memoryoverhead }}
+#
+spark.executor.cores                {{ spark_executor_cores }}
+spark.executor.memory               {{ spark_executor_memory }}
+spark.yarn.executor.memoryOverhead  {{ spark_yarn_executor_memoryoverhead }}
+spark.executor.instances            {{ spark_executor_instances }}
+#
+spark.eventLog.enabled              {{ spark_eventlog_enabled }}
+spark.eventLog.dir                  hdfs://{{ hdfs_cluster_name }}/{{ spark_eventlog_dir }}
+spark.eventLog.compress             {{ spark_eventlog_compress }}
+#
+spark.yarn.jars                     hdfs://{{ hdfs_cluster_name }}/{{ spark_yarn_jars_dir }}/*
+spark.serializer                    {{ spark_serializer }}

@@ -1,0 +1,28 @@
+---
+# default vars for compute role
+#
+# openstack
+os_release: stein
+
+# ntp
+ntp_servers:
+  - 10.9.36.10
+  - 10.9.36.178
+  - 10.9.40.35
+
+# nova-compute
+ceph_client_admin_key: AQBtUWdX4mcqGRAA6F8MtFsBkQ/1FVRtRAX5Mg==
+ceph_rbd_user: admin
+secret_uuid: 677f9afe-b86c-4c9d-9ba7-9ae6478e3a72
+rabbit_cluster: admin:admin@controller-1:5672,admin:admin@compute-1:5672,admin:admin@block-storage-1:5672
+controller_host: controller-1
+controller_host_ip: 10.9.36.178
+nova_pass: nova
+placement_pass: placement
+libvirt_virt_type: qemu
+vms_rbd_pool: test
+
+# neutron
+neutron_pass: neutron
+metadata_secret: admin
+provider_interface: ens6

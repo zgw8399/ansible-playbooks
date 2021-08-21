@@ -1,0 +1,4 @@
+- name: "Genrate kubeadm config file"
+  template:
+    src: kubeadm-config.yml.j2
+    dest: /root/kubeadm-config.yml

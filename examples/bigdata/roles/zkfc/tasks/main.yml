@@ -1,0 +1,5 @@
+- name: "Start ZKFC daemon"
+  shell: "su - hdfs -c 'hadoop-daemon.sh start zkfc' && touch start-zkfc.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-zkfc.done

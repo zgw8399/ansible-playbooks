@@ -1,0 +1,21 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Add openstack repo"
+  shell: |
+    echo | add-apt-repository cloud-archive:{{ os_release }}
+  args:
+    creates: "/etc/apt/sources.list.d/cloudarchive-{{ os_release }}.list"
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - python3-openstackclient

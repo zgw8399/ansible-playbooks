@@ -1,0 +1,4 @@
+---
+- hosts: ceph-admin
+  roles:
+    - storage-cluster

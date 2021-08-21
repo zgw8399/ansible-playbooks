@@ -1,0 +1,54 @@
+- import_tasks: ubuntu.yml
+
+- name: "Enable apache rewrite module"
+  apache2_module:
+    name: rewrite
+    state: present
+
+- name: "Create rootdir"
+  file:
+    path: "{{ http_fileserver_path }}"
+    state: directory
+    mode: 0755
+
+- name: "Create rootdir config"
+  template:
+    src: "{{ domain }}.conf"
+    dest: "/etc/apache2/conf-available/{{ domain }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Link rootdir config to conf-enabled"
+  file:
+    src: "/etc/apache2/conf-available/{{ domain }}.conf"
+    dest: "/etc/apache2/conf-enabled/{{ domain }}.conf"
+    state: link
+
+- name: "Create vhost config"
+  template:
+    src: "{{ domain }}-site.conf"
+    dest: "/etc/apache2/sites-available/{{ domain }}-site.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Link vhost config to sites-enabled"
+  file:
+    src: "/etc/apache2/sites-available/{{ domain }}-site.conf"
+    dest: "/etc/apache2/sites-enabled/{{ domain }}-site.conf"
+    state: link
+
+- name: "Remove default vhost config"
+  file:
+    path: "/etc/apache2/sites-enabled/000-default.conf"
+    state: absent
+  notify: restart apache
+
+- name: "Add test file"
+  copy:
+    src: "testfile.txt"
+    dest: "{{ http_fileserver_path }}/testfile.txt"
+    owner: root
+    group: root
+    mode: 0644

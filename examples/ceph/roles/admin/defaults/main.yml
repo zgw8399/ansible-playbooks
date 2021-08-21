@@ -1,0 +1,12 @@
+---
+# default vars for admin role
+#
+ntp_servers:
+  - 10.9.36.10
+  - 10.9.40.35
+#
+hostname_prefix: ceph
+deploy_user_name: cephadmin
+local_user: keda
+#
+ceph_conf_dir: /etc/ceph

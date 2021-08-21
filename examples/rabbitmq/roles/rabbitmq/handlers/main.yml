@@ -1,0 +1,7 @@
+---
+# handlers for rabbitmq role
+#
+- name: restart rabbitmq
+  service:
+    name=rabbitmq-server
+    state=restarted

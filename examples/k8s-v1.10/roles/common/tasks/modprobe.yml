@@ -1,0 +1,6 @@
+- name: "Add some modules"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - br_netfilter

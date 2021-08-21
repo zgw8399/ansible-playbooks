@@ -1,0 +1,41 @@
+- import_tasks: ubuntu.yml
+
+- name: "Create some dirs for etcd"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ etcd_ssl_dir }}"
+
+- name: "Copy certs for etcd"
+  copy:
+    src: "{{ cfssl_certs_dir }}/{{ item }}"
+    dest: "{{ etcd_ssl_dir }}/{{ item }}"
+  with_items:
+    - etcd.pem
+    - etcd-key.pem
+    - etcd-ca.pem
+    - etcd-ca-key.pem
+
+- name: "Config etcd"
+  template:
+    src: etcd.j2
+    dest: /etc/default/etcd
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart etcd
+
+- name: "Config etcd.service start on boot"
+  shell: |
+    systemctl enable etcd.service && touch enable-etcd-service.done
+  args:
+    creates: enable-etcd-service.done
+
+- name: "Config env for etcdctl"
+  template:
+    src: etcd.sh.j2
+    dest: /etc/profile.d/etcd.sh
+    owner: root
+    group: root
+    mode: 0644

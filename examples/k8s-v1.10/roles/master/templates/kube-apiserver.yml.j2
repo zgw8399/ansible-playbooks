@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    scheduler.alpha.kubernetes.io/critical-pod: ""
+  labels:
+    component: kube-apiserver
+    tier: control-plane
+  name: kube-apiserver
+  namespace: kube-system
+spec:
+  hostNetwork: true
+  containers :
+  - name: kube-apiserver
+    image: {{ registry_server }}/{{ project }}/{{ apiserver_image }}:{{ kube_release }}
+    command:
+      - kube-apiserver
+      - --v={{ log_level }}
+      - --logtostderr=true
+      - --allow-privileged=true
+      - --bind-address={{ apiserver_bind_address }}
+      - --secure-port={{ apiserver_secure_port }}
+      - --insecure-port={{ apiserver_insecure_port }}
+      - --advertise-address={{ ansible_ens33.ipv4.address }}
+      - --service-cluster-ip-range={{ service_cluster_ip_range }}
+      - --service-node-port-range={{ service_node_port_range }}
+      - --etcd-servers={{ etcd_servers }}
+      - --etcd-cafile={{ kube_pki_dir }}/etcd-ca.pem
+      - --etcd-certfile={{ kube_pki_dir }}/etcd.pem
+      - --etcd-keyfile={{ kube_pki_dir }}/etcd-key.pem
+      - --client-ca-file={{ kube_pki_dir }}/ca.pem
+      - --tls-cert-file={{ kube_pki_dir }}/apiserver.pem
+      - --tls-private-key-file={{ kube_pki_dir }}/apiserver-key.pem
+      - --kubelet-client-certificate={{ kube_pki_dir }}/apiserver.pem
+      - --kubelet-client-key={{ kube_pki_dir }}/apiserver-key.pem
+      - --service-account-key-file={{ kube_pki_dir }}/sa.pub
+      - --token-auth-file={{ kube_conf_dir }}/token.csv
+      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+      - --disable-admission-plugins={{ apiserver_disable_admission }}
+      - --enable-admission-plugins={{ apiserver_enable_admission }}
+      - --authorization-mode={{ apiserver_authorization_mode }}
+      - --enable-bootstrap-token-auth=true
+      - --requestheader-client-ca-file={{ kube_pki_dir }}/front-proxy-ca.pem
+      - --proxy-client-cert-file={{ kube_pki_dir }}/front-proxy-client.pem
+      - --proxy-client-key-file={{ kube_pki_dir }}/front-proxy-client-key.pem
+      - --requestheader-allowed-names={{ apiserver_allowed_names }}
+      - --requestheader-group-headers=X-Remote-Group
+      - --requestheader-extra-headers-prefix=X-Remote-Extra-
+      - --requestheader-username-headers=X-Remote-User
+      - --audit-log-maxage=30
+      - --audit-log-maxbackup=3
+      - --audit-log-maxsize=128
+      - --audit-log-path={{ kube_log_dir }}/audit.log
+      - --audit-policy-file={{ kube_conf_dir }}/audit-policy.yml
+      - --experimental-encryption-provider-config={{ kube_conf_dir }}/encryption.yml
+      - --event-ttl=1h
+    livenessProbe:
+      failureThreshold: 8
+      httpGet:
+        host: 127.0.0.1
+        path: /healthz
+        port: {{ apiserver_secure_port }}
+        scheme: HTTPS
+      initialDelaySeconds: 15
+      timeoutSeconds: 15
+    resources:
+      requests:
+        cpu: 250m
+    volumeMounts:
+    - mountPath: {{ kube_log_dir }}
+      name: k8s-audit-log
+    - mountPath: {{ kube_pki_dir }}
+      name: k8s-certs
+      readOnly: true
+    - mountPath: /etc/ssl/certs
+      name: ca-certs
+      readOnly: true
+    - mountPath: {{ kube_conf_dir }}/encryption.yml
+      name: encryption-config
+      readOnly: true
+    - mountPath: {{ kube_conf_dir }}/audit-policy.yml
+      name: audit-config
+      readOnly: true
+    - mountPath: {{ kube_conf_dir }}/token.csv
+      name: token-csv
+      readOnly: true
+  volumes:
+  - hostPath:
+      path: {{ kube_log_dir }}
+      type: Directory
+    name: k8s-audit-log
+  - hostPath:
+      path: {{ kube_pki_dir }}
+      type: Directory
+    name: k8s-certs
+  - hostPath:
+      path: /etc/ssl/certs
+      type: Directory
+    name: ca-certs
+  - hostPath:
+      path: {{ kube_conf_dir }}/encryption.yml
+      type: File
+    name: encryption-config
+  - hostPath:
+      path: {{ kube_conf_dir }}/audit-policy.yml
+      type: File
+    name: audit-config
+  - hostPath:
+      path: {{ kube_conf_dir }}/token.csv
+      type: File
+    name: token-csv

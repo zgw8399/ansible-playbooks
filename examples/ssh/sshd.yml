@@ -1,0 +1,19 @@
+---
+- hosts: testserver
+
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+  tasks:
+    - name: "Config sshd"
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "{{ item }}"
+      with_items:
+        - UseDNS no
+      # notify: restart ssh

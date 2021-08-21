@@ -1,0 +1,27 @@
+- name: "Get binary installation package"
+  get_url:
+    url: "{{ hbase_url }}/hbase-{{ hbase_version }}-bin.tar.gz"
+    dest: "{{ hbase_install_path }}/hbase-{{ hbase_version }}-bin.tar.gz"
+    mode: 0440
+
+- name: "Extract the binary package"
+  shell: "if [ -f hbase-{{ hbase_version }}-bin.tar.gz ]; then tar -zxf hbase-{{ hbase_version }}-bin.tar.gz; fi && touch extract-hbase.done"
+  args:
+    chdir: "{{ hbase_install_path }}"
+    creates: extract-hbase.done
+
+- name: "Create a link directory"
+  file:
+    src: "{{ hbase_install_path }}/hbase-{{ hbase_version }}"
+    dest: "{{ hbase_home }}"
+    state: link
+
+- name: "Set directory permissions"
+  file:
+    path: "{{ hbase_install_path }}/hbase-{{ hbase_version }}"
+    owner: root
+    group: bigdata
+    state: directory
+    mode: 0775
+    recurse: yes
+  changed_when: false

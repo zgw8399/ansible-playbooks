@@ -1,0 +1,18 @@
+---
+# default vars for mariadb role
+#
+# for common configuration
+data_dir: /var/lib/mysql
+#
+# for innodb configuration
+buffer_pool_size: 1024M
+log_file_size: 256M
+#
+# for galera cluster configuration
+provider: /usr/lib/libgalera_smm.so
+provider_options: "pc.recovery=TRUE;gcache.size=600M"
+cluster_name: mariadb_cluster
+cluster_address: "10.9.36.21,10.9.36.22,10.9.36.23"
+sst_method: rsync
+sst_auth: "wsrep:wsrep"
+slave_threads: 2

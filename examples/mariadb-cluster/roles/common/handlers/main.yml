@@ -1,0 +1,8 @@
+---
+# handlers for common role
+#
+- name: restart xinetd
+  service:
+    name: xinetd
+    state: restarted
+    enabled: yes

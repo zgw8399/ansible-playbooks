@@ -1,0 +1,14 @@
+- import_tasks: install.yml
+
+- name: "Create some dirs for k8s"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ kube_pki_dir }}"
+
+- name: "Config env vars for k8s"
+  template:
+    src: k8s.sh.j2
+    dest: /etc/profile.d/k8s.sh
+    mode: 0644

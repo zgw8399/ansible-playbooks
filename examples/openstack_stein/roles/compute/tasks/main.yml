@@ -1,0 +1,4 @@
+- import_tasks: ubuntu.yml
+- import_tasks: chrony.yml
+- import_tasks: nova-compute.yml
+- import_tasks: neutron.yml

@@ -1,0 +1,5 @@
+- name: "Start ResourceManager daemon"
+  shell: "su - yarn -c 'yarn-daemon.sh start resourcemanager' && touch start-resourcemanager.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-resourcemanager.done

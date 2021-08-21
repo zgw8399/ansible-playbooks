@@ -1,0 +1,171 @@
+- name: "Configure keystone"
+  template:
+    src: keystone.conf.j2
+    dest: /etc/keystone/keystone.conf
+    owner: keystone
+    group: keystone
+    mode: '0644'
+
+- name: "Import keystone data"
+  shell: |
+    su -s /bin/sh -c "keystone-manage db_sync" keystone && \
+    touch import_data.done
+  args:
+    chdir: /etc/keystone
+    creates: import_data.done
+  run_once: true
+  delegate_to: "{{ db_host }}"
+
+- name: "Setup fernet and credential"
+  shell: |
+    keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone && \
+    keystone-manage credential_setup --keystone-user keystone --keystone-group keystone && \
+    keystone-manage bootstrap --bootstrap-password {{ admin_pass }} --bootstrap-admin-url http://{{ controller_host }}:5000/v3/ --bootstrap-internal-url http://{{ controller_host }}:5000/v3/ --bootstrap-public-url http://{{ controller_host }}:5000/v3/ --bootstrap-region-id RegionOne && \
+    touch setup_keystone.done
+  args:
+    chdir: /etc/keystone
+    creates: setup_keystone.done
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+
+- name: "Configure apache2"
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    regexp: '^ServerName'
+    insertafter: EOF
+    line: 'ServerName {{ controller_host }}'
+    backup: yes
+  notify: restart apache2
+
+- name: "Configure /etc/apache2/ports.conf"
+  lineinfile:
+    path: /etc/apache2/ports.conf
+    regexp: '^Listen 80'
+    line: "Listen {{ ansible_ens3.ipv4.address }}:80"
+  notify: restart apache2
+
+- meta: flush_handlers
+
+- name: "Configure client env"
+  template:
+    src: admin-openrc.sh.j2
+    dest: /etc/profile.d/admin-openrc.sh
+    owner: root
+    group: root
+    mode: '0644'
+
+## Genrate Keystone Data ##
+
+- name: "Create service project"
+  os_project:
+    state: present
+    name: service
+    description: "Service Project"
+    domain_id: default
+    enabled: True
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+
+- name: "Create some users"
+  os_user:
+    state: present
+    name: "{{ item.name }}"
+    password: "{{ item.pass }}"
+    domain: default
+    default_project: service
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - { name: "placement", pass: "{{ placement_pass }}" }
+    - { name: "glance", pass: "{{ glance_pass }}" }
+    - { name: "nova", pass: "{{ nova_pass }}" }
+    - { name: "neutron", pass: "{{ neutron_pass }}" }
+    - { name: "cinder", pass: "{{ cinder_pass }}" }
+
+- name: "Grant an admin role on the users in the project service"
+  os_user_role:
+    user: "{{ item }}"
+    role: admin
+    project: service
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - placement
+    - glance
+    - nova
+    - neutron
+    - cinder
+
+- name: "Create some services"
+  os_keystone_service:
+     state: present
+     name: "{{ item.name }}"
+     service_type: "{{ item.st }}"
+     description: "{{ item.des }}"
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - { name: "placement", st: "placement", des: "Placement API" }
+    - { name: "glance", st: "image", des: "OpenStack Image" }
+    - { name: "nova", st: "compute", des: "OpenStack Compute" }
+    - { name: "neutron", st: "network", des: "OpenStack Networking" }
+    - { name: "cinderv2", st: "volumev2", des: "OpenStack Block Storage" }
+    - { name: "cinderv3", st: "volumev3", des: "OpenStack Block Storage" }
+
+- name: "Create some public endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: public
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - { service: "placement", url: "http://{{ controller_host }}:8778" }
+    - { service: "glance", url: "http://{{ controller_host }}:9292" }
+    - { service: "nova", url: "http://{{ controller_host }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ controller_host }}:9696" }
+    - { service: "cinderv2", url: "http://{{ controller_host }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ controller_host }}:8776/v3/%(project_id)s" }
+
+- name: "Create some internal endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: internal
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - { service: "placement", url: "http://{{ controller_host }}:8778" }
+    - { service: "glance", url: "http://{{ controller_host }}:9292" }
+    - { service: "nova", url: "http://{{ controller_host }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ controller_host }}:9696" }
+    - { service: "cinderv2", url: "http://{{ controller_host }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ controller_host }}:8776/v3/%(project_id)s" }
+
+- name: "Create some admin endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: admin
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  run_once: true
+  delegate_to: "{{ controller_host }}"
+  environment: "{{ admin_env }}"
+  with_items:
+    - { service: "placement", url: "http://{{ controller_host }}:8778" }
+    - { service: "glance", url: "http://{{ controller_host }}:9292" }
+    - { service: "nova", url: "http://{{ controller_host }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ controller_host }}:9696" }
+    - { service: "cinderv2", url: "http://{{ controller_host }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ controller_host }}:8776/v3/%(project_id)s" }

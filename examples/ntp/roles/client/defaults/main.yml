@@ -1,0 +1,6 @@
+---
+# default vars for ntp client role
+#
+ntp_servers:
+  - 10.9.36.10
+  - 10.9.40.35

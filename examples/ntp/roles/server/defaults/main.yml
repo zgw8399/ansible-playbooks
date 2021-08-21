@@ -1,0 +1,6 @@
+---
+# default vars for ntp-server role
+#
+ntp_pools:
+  - cn.ntp.org.cn
+  - edu.ntp.org.cn

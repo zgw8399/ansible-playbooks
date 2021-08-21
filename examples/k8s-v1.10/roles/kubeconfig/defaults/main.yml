@@ -1,0 +1,16 @@
+---
+# default var file for kubeconfig role
+#
+cfssl_certs_dir: /etc/cfssl/certs
+#
+kube_url: http://10.9.36.96/downloads/K8S
+kube_release: v1.14.1
+kube_install_path: /usr/local/bin
+kube_conf_dir: /etc/kubernetes
+kube_pki_dir: /etc/kubernetes/pki
+# generate command: head -c 16 /dev/urandom | od -An -t x | tr -d ' '
+bootstrap_token: d99cfc0a182a0e8bea88ef6fbb0e926b
+kube_apiserver: https://10.9.36.21:6443
+kube_master_1: k8s-21
+kube_master_2: k8s-22
+kube_master_3: k8s-23

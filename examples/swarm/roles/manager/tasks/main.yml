@@ -1,0 +1,16 @@
+- import_tasks: ubuntu.yml
+
+- name: "Check if docker is running"
+  stat: path=/var/run/docker.sock
+  register: docker_stat
+  failed_when: not docker_stat.stat.exists
+
+- name: "Determine if the manager node exists"
+  shell: "docker node ls | grep -o {{ ansible_hostname }}"
+  register: manager_command_result
+  ignore_errors: yes
+  changed_when: false
+
+- name: "Initialize a new swarm cluster in the manager node"
+  shell: "docker swarm init --advertise-addr {{ manager_advertise_addr }}"
+  when: not manager_command_result.stdout

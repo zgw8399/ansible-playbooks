@@ -1,0 +1,13 @@
+---
+# default vars for common role
+#
+# Test Database
+database_name: testdb
+database_user: test
+database_password: test
+remote_access_host: '%'
+
+# Health Check
+health_check_user: clustercheck
+health_check_password: clustercheck
+health_check_port: 9200

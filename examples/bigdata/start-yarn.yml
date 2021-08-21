@@ -1,0 +1,19 @@
+---
+- hosts:
+    - testserver
+    - testserver2
+  become: true
+  roles:
+    - resourcemanager
+
+- hosts:
+    - slave
+  become: true
+  roles:
+    - nodemanager
+
+- hosts:
+    - testserver
+  become: true
+  roles:
+    - mrjobhistory

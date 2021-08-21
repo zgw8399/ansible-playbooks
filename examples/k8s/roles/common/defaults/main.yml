@@ -1,0 +1,11 @@
+---
+# default vars for common role
+#
+# Sysctl
+sysctl_file: /etc/sysctl.d/k8s.conf
+
+# Docker
+docker_package_version: 18.09.7-0ubuntu1~18.04.3
+
+# K8S
+k8s_package_version: 1.15.0-00

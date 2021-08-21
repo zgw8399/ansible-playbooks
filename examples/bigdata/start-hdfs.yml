@@ -1,0 +1,53 @@
+---
+- hosts:
+    - testserver
+  become: true
+  roles:
+    - formatzk
+
+- hosts:
+    - master
+  become: true
+  roles:
+    - journalnode
+
+- hosts:
+    - testserver
+  become: true
+  roles:
+    - format
+
+- hosts:
+    - testserver
+  vars:
+    - hadoop_role: active
+  become: true
+  roles:
+    - namenode
+
+- hosts:
+    - testserver2
+  vars:
+    - hadoop_role: standby
+  become: true
+  roles:
+    - namenode
+
+- hosts:
+    - testserver
+    - testserver2
+  become: true
+  roles:
+    - zkfc
+
+- hosts:
+    - slave
+  become: true
+  roles:
+    - datanode
+
+- hosts:
+    - testserver
+  become: true
+  roles:
+    - httpfs

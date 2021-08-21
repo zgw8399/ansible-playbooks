@@ -1,0 +1,29 @@
+---
+# default vars for storage-cluster
+#
+storage_cluster_dir: ~/my-cluster
+#
+cluster_fsid: dee4b19e-ca05-4de7-8162-e8bc082020ca
+public_network: 10.9.36.0/24
+cluster_network: 
+mon_initial_members: "ceph-21, ceph-22, ceph-222"
+mon_host: "10.9.36.21,10.9.36.22,10.9.36.222"
+#
+osd_journal_size: 10240
+osd_pool_default_size: 3
+osd_pool_default_min_size: 2
+osd_pool_default_pg_num: 8
+osd_pool_default_pgp_num: 8
+# value: 0/1/2/3
+osd_crush_chooseleaf_type: 1
+mon_osd_full_ratio: ".95"
+mon_osd_nearfull_ratio: ".85"
+osd_backfill_full_ratio: ".90"
+osd_max_backfills: 1
+#
+mon_clock_drift_allowed: 3
+mon_clock_drift_warn_backoff: 10
+mon_allow_pool_delete: "false"
+#
+osd_scrub_begin_hour: 22
+osd_scrub_end_hour: 7

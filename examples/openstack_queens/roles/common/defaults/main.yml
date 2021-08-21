@@ -1,0 +1,5 @@
+---
+# default vars for common role
+#
+# openstack
+os_release: queens

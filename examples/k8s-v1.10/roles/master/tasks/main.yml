@@ -1,0 +1,106 @@
+- name: "Create the required directory"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ kube_pki_dir }}"
+    - "{{ kube_manifests_dir }}"
+    - "{{ kube_addons_dir }}"
+    - "{{ kubelet_service_conf_dir }}"
+    - "{{ kubelet_data_dir }}"
+    - "{{ kube_log_dir }}"
+    - "{{ kubectl_conf_dir }}"
+    - "{{ cni_conf_dir }}"
+    - "{{ cni_bin_dir }}"
+
+- name: "Get the required certs"
+  copy:
+    src: "{{ cfssl_certs_dir }}/{{ item }}"
+    dest: "{{ kube_pki_dir }}/{{ item }}"
+    mode: 0640
+  with_items:
+    - etcd-ca-key.pem
+    - etcd-ca.pem
+    - etcd-key.pem
+    - etcd.pem
+    - admin-key.pem
+    - admin.pem
+    - apiserver-key.pem
+    - apiserver.pem
+    - ca-key.pem
+    - ca.pem
+    - controller-manager-key.pem
+    - controller-manager.pem
+    - front-proxy-ca-key.pem
+    - front-proxy-ca.pem
+    - front-proxy-client-key.pem
+    - front-proxy-client.pem
+    - kube-proxy-key.pem
+    - kube-proxy.pem
+    - scheduler-key.pem
+    - scheduler.pem
+
+- name: "Get the required configuration file"
+  copy:
+    src: "{{ kube_conf_dir }}/{{ item }}"
+    dest: "{{ kube_conf_dir }}/{{ item }}"
+  with_items:
+    - admin.conf
+    - controller-manager.conf
+    - "{{ ansible_hostname }}-kubelet.conf"
+    - kube-proxy.conf
+    - scheduler.conf
+    - token.csv
+    - pki/sa.key
+    - pki/sa.pub
+
+- name: "Create soft link for kubelet kubeconfig"
+  file:
+    src: "{{ kube_conf_dir }}/{{ ansible_hostname }}-kubelet.conf"
+    dest: "{{ kube_conf_dir }}/kubelet.conf"
+    state: link
+
+- name: "Generate the required static pod template"
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kube_manifests_dir }}/{{ item }}"
+  with_items:
+    - kube-apiserver.yml
+    - kube-controller-manager.yml
+    - kube-scheduler.yml
+
+- name: "Generate a yaml file that encrypts etcd"
+  template:
+    src: encryption.yml.j2
+    dest: "{{ kube_conf_dir }}/encryption.yml"
+
+- name: "Generate an advanced auditing strategy yaml file"
+  template:
+    src: audit-policy.yml.j2
+    dest: "{{ kube_conf_dir }}/audit-policy.yml"
+
+- name: "Generate kubelet service file"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+  with_items:
+    - { src: "kubelet.service.j2", dest: "/lib/systemd/system/kubelet.service" }
+    - { src: "10-kubelet.conf.j2", dest: "/etc/systemd/system/kubelet.service.d/10-kubelet.conf" }
+  notify: restart kubelet
+
+- name: "Get kubectl config file"
+  file:
+    src: "{{ kube_conf_dir }}/admin.conf"
+    dest: "{{ kubectl_conf_dir }}/config"
+    state: link
+
+- name: "Generate addons yaml file"
+  template:
+    src: "addons/{{ item }}.j2"
+    dest: "{{ kube_addons_dir }}/{{ item }}"
+  with_items:
+    - apiserver-to-kubelet-rbac.yml
+    - kube-proxy.yml
+    - kube-dns.yml
+    - flannel.yml

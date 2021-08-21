@@ -1,0 +1,55 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install mysql_db module"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+
+- name: "Create database"
+  mysql_db:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - keystone
+    - glance
+    - nova_api
+    - nova
+    - nova_cell0
+    - neutron
+    - cinder
+
+- name: "Create local user"
+  mysql_user:
+    name: "{{ item.dbuser }}"
+    password: "{{ item.dbpass }}"
+    priv: "{{ item.priv }}"
+    state: present
+  with_items:
+    - { dbuser: "keystone", dbpass: "{{ keystone_dbpass }}", priv: "keystone.*:ALL" }
+    - { dbuser: "glance", dbpass: "{{ glance_dbpass }}", priv: "glance.*:ALL" }
+    - { dbuser: "nova", dbpass: "{{ nova_dbpass }}", priv: "nova_api.*:ALL/nova.*:ALL/nova_cell0.*:ALL" }
+    - { dbuser: "neutron", dbpass: "{{ neutron_dbpass }}", priv: "neutron.*:ALL" }
+    - { dbuser: "cinder", dbpass: "{{ cinder_dbpass }}", priv: "cinder.*:ALL" }
+
+- name: "Create remote user"
+  mysql_user:
+    name: "{{ item.dbuser }}"
+    password: "{{ item.dbpass }}"
+    priv: "{{ item.priv }}"
+    state: present
+    host: "{{ remote_access_hosts }}"
+  with_items:
+    - { dbuser: "keystone", dbpass: "{{ keystone_dbpass }}", priv: "keystone.*:ALL" }
+    - { dbuser: "glance", dbpass: "{{ glance_dbpass }}", priv: "glance.*:ALL" }
+    - { dbuser: "nova", dbpass: "{{ nova_dbpass }}", priv: "nova_api.*:ALL/nova.*:ALL/nova_cell0.*:ALL" }
+    - { dbuser: "neutron", dbpass: "{{ neutron_dbpass }}", priv: "neutron.*:ALL" }
+    - { dbuser: "cinder", dbpass: "{{ cinder_dbpass }}", priv: "cinder.*:ALL" }

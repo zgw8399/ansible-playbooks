@@ -1,0 +1,37 @@
+[global]
+#
+fsid = {{ cluster_fsid }}
+public_network = {{ public_network }}
+mon_initial_members = {{ mon_initial_members }}
+mon_host = {{ mon_host }}
+auth_cluster_required = cephx
+auth_service_required = cephx
+auth_client_required = cephx
+#
+osd journal size = {{ osd_journal_size }}
+osd pool default size = {{ osd_pool_default_size }}
+osd pool default min size = {{ osd_pool_default_min_size }}
+osd pool default pg num = {{ osd_pool_default_pg_num }}
+osd pool default pgp num = {{ osd_pool_default_pgp_num }}
+osd crush update on start = false
+osd crush chooseleaf type = {{ osd_crush_chooseleaf_type }}
+mon osd full ratio = {{ mon_osd_full_ratio }}
+mon osd nearfull ratio = {{ mon_osd_nearfull_ratio }}
+osd backfill full ratio = {{ osd_backfill_full_ratio }}
+osd max backfills = {{ osd_max_backfills }}
+#
+[mon]
+#
+mon clock drift allowed = {{ mon_clock_drift_allowed }}
+mon clock drift warn backoff = {{ mon_clock_drift_warn_backoff }}
+mon allow pool delete = {{ mon_allow_pool_delete }}
+#
+[osd]
+#
+osd scrub begin hour = {{ osd_scrub_begin_hour }}
+osd scrub end hour = {{ osd_scrub_end_hour }}
+#
+[client]
+#
+rbd cache = true
+rbd cache writethrough until flush = true

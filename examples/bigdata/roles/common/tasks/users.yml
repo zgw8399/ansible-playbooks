@@ -1,0 +1,22 @@
+- name: "Create an additional group"
+  group:
+    name: "{{ bigdata_group_name }}"
+    gid: "{{ bigdata_group_id }}"
+    state: present
+
+- name: "Create some users"
+  user:
+    name: "{{ item.user_name }}"
+    uid: "{{ item.user_id }}"
+    password: "{{ item.user_password }}"
+    comment: "{{ item.user_comment }}"
+    groups: "{{ bigdata_group_name }}"
+    append: yes
+    create_home: true
+    shell: "{{ user_shell }}"
+    state: present
+  with_items:
+    - "{{ hdfs_user }}" 
+    - "{{ yarn_user }}"
+    - "{{ hbase_user }}"
+    - "{{ spark_user }}"

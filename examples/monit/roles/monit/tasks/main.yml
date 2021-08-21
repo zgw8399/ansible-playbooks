@@ -1,0 +1,11 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config monit"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/monit/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ config_files }}"
+  notify: reload monit

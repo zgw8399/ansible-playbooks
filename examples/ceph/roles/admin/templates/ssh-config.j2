@@ -1,0 +1,5 @@
+{% for id in range(21,230) %}
+Host {{ hostname_prefix }}-{{ id }}
+   Hostname {{ hostname_prefix }}-{{ id }}
+   User {{ deploy_user_name }}
+{% endfor %}

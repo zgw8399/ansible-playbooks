@@ -1,0 +1,38 @@
+---
+# handlers for compute role
+#
+- name: restart chrony
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: chrony
+
+- name: restart nova-compute
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: nova-compute
+
+- name: restart openvswitch-switch
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: openvswitch-switch
+
+- name: restart neutron-openvswitch-agent
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: neutron-openvswitch-agent
+
+- name: restart neutron-dhcp-agent
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: neutron-dhcp-agent
+
+- name: restart neutron-metadata-agent
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: neutron-metadata-agent

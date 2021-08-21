@@ -1,0 +1,38 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - nano
+    - vim
+    - emacs
+    - net-tools
+    - wget
+    - apt-transport-https
+    - iftop
+    - tcpdump
+    - chrony
+
+- name: "Installing ceph software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceph-deploy
+    - ceph-common
+    - ceph-base
+
+- name: "Create some dirs"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ ceph_conf_dir }}"

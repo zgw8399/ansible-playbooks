@@ -1,0 +1,13 @@
+---
+# default vars for master role
+#
+kube_url: http://10.9.36.96/downloads/K8S
+kube_release: v1.10.13
+kube_install_path: /usr/local/bin
+#
+cni_url: http://10.9.36.96/downloads/K8S
+cni_bin_package: cni-plugins-linux-amd64-v0.8.0.tgz
+cni_install_path: /opt/cni/bin
+#
+kube_pki_dir: /etc/kubernetes/pki
+kube_apiserver: https://10.9.36.21:6443

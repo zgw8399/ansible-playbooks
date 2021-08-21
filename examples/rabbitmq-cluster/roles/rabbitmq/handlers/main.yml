@@ -1,0 +1,8 @@
+---
+# handlers for rabbitmq role
+#
+- name: restart rabbitmq
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: rabbitmq-server

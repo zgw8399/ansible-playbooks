@@ -1,0 +1,30 @@
+---
+# default vars file for monit role
+#
+# config files
+config_files:
+  - mail-config
+  - web-config
+  - system-config
+
+# vars for mail
+mail_server: 10.9.33.233
+username: zhanggwb@kedachina.com.cn
+password: keda,99
+alert_user: zhanggwb@kedachina.com.cn
+from: zhanggwb@kedachina.com.cn
+subject: Test Alert
+signarute: Test
+
+# vars for web
+httpd_port: 2812
+httpd_address: 0.0.0.0
+allow_address: 0.0.0.0/0
+httpd_user_pass: admin:admin
+
+# vars for system
+loadavg_1min: 8
+loadavg_5min: 4
+cpu_usage: 95%
+memory_usage: 75%
+swap_usage: 25%

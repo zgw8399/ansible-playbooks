@@ -1,0 +1,19 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install zabbix-proxy"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-proxy-mysql
+
+- name: "Boot zabbix-proxy"
+  shell: "systemctl enable zabbix-proxy && touch /etc/zabbix/enable_zabbix_proxy.done"
+  args:
+    creates: "/etc/zabbix/enable_zabbix_proxy.done"

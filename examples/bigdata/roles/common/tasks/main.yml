@@ -1,0 +1,7 @@
+- import_tasks: ubuntu.yml
+- import_tasks: hostname.yml
+- import_tasks: hosts.yml
+- import_tasks: users.yml
+- import_tasks: chrony.yml
+- import_tasks: java.yml
+- import_tasks: ssh.yml 

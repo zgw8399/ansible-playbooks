@@ -1,0 +1,27 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config myid"
+  template:
+    src: myid.j2
+    dest: /etc/zookeeper/conf/myid
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart zookeeper
+
+- name: "Config zoo.cfg"
+  template:
+    src: zoo.cfg.j2
+    dest: /etc/zookeeper/conf/zoo.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart zookeeper
+
+- name: "Config env"
+  template:
+    src: zookeeper.sh.j2
+    dest: /etc/profile.d/zookeeper.sh
+    owner: root
+    group: root
+    mode: 0644

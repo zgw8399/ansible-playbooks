@@ -1,0 +1,10 @@
+- name: "Configure network"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/netplan/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - 01-netcfg.yaml
+    - bridge_vlan.yaml

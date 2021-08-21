@@ -1,0 +1,15 @@
+[api]
+auth_strategy = keystone
+
+[keystone_authtoken]
+auth_url = http://{{ controller_host }}:5000/v3
+memcached_servers = {{ controller_host }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = placement
+password = {{ placement_pass }}
+
+[placement_database]
+connection = mysql+pymysql://placement:{{ placement_dbpass }}@{{ db_host }}/placement

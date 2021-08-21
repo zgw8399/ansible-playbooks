@@ -1,0 +1,14 @@
+- name: "Config ssh for local user"
+  template:
+    src: ssh-config.j2
+    dest: "/home/{{ local_user }}/.ssh/config"
+    owner: "{{ local_user }}"
+    group: "{{ local_user }}"
+    mode: 0644
+
+- name: "Cancel the ssh client to receive the key prompt"
+  lineinfile:
+    path: /etc/ssh/ssh_config
+    regexp: '^StrictHostKeyChecking'
+    insertafter: '^#   StrictHostKeyChecking'
+    line: 'StrictHostKeyChecking no'

@@ -1,0 +1,21 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install zabbix-server"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-server-mysql
+    - zabbix-frontend-php
+    - php-mysql
+
+- name: "Boot zabbix-server"
+  shell: "systemctl enable zabbix-server && touch /etc/zabbix/enable_zabbix_server.done"
+  args:
+    creates: "/etc/zabbix/enable_zabbix_server.done"

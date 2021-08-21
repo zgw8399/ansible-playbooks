@@ -1,0 +1,4 @@
+---
+# default vars file for slave role
+#
+hadoop_home: /usr/local/hadoop 

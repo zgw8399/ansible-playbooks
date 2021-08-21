@@ -1,0 +1,8 @@
+---
+# info for galaxy
+#
+galaxy_info:
+  author: Varden Zhang
+  description: Installing and maintaining zabbix-server for Ubuntu.
+  company: keda
+  ansible_version: 2.5

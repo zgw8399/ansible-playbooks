@@ -1,0 +1,20 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install mariadb"
+  apt: 
+    name=mariadb-server
+    state=present
+
+- name: "Install mysql_db module"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-mysqldb
+    - python-pymysql

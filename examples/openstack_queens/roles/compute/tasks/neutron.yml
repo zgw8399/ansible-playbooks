@@ -1,0 +1,35 @@
+- name: "Configure neutron"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: neutron
+    mode: '0644'
+  with_items:
+    - { src: "neutron.conf.j2", dest: "/etc/neutron/neutron.conf" }
+    - { src: "openvswitch_agent.ini.j2", dest: "/etc/neutron/plugins/ml2/openvswitch_agent.ini" }
+  notify:
+    - restart neutron-openvswitch-agent
+    - restart openvswitch-switch
+
+- name: "Configure dhcp_agent and metadata_agent"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: neutron
+    mode: '0644'
+  with_items:
+    - { src: "dhcp_agent.ini.j2", dest: "/etc/neutron/dhcp_agent.ini" }
+    - { src: "metadata_agent.ini.j2", dest: "/etc/neutron/metadata_agent.ini" }
+  notify:
+    - restart neutron-dhcp-agent
+    - restart neutron-metadata-agent
+  when: role == "dhcp_agent"
+
+- name: "Add br-provider"
+  shell: |
+    ovs-vsctl add-br br-provider && ovs-vsctl add-port br-provider {{ provider_interface }} && touch add_br.done
+  args:
+    chdir: /etc/neutron
+    creates: add_br.done

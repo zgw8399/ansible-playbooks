@@ -1,0 +1,12 @@
+---
+# handlers file for zabbix-proxy role
+#
+- name: restart zabbix-proxy
+  service:
+    name: zabbix-proxy
+    state: restarted
+
+- name: restart mysql
+  service:
+    name: mysql
+    state: restarted

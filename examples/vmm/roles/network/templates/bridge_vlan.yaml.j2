@@ -1,0 +1,16 @@
+network:
+  version: 2
+  renderer: networkd
+  vlans:
+{% for vlan_id in vlan_ids %}
+    vlan{{ vlan_id }}:
+      accept-ra: no
+      id: {{ vlan_id }}
+      link: {{ vlan_link_eth }}
+{% endfor %}
+  bridges:
+{% for vlan_id in vlan_ids %}
+    br-vlan{{ vlan_id }}:
+      interfaces:
+        - vlan{{ vlan_id }}
+{% endfor %}

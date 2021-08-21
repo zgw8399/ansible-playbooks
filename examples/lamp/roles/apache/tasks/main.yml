@@ -1,0 +1,16 @@
+- import_tasks: ubuntu.yml
+
+- name: "Enable apache rewrite module"
+  apache2_module: 
+    name=rewrite
+    state=present
+  notify: restart apache
+
+- name: "Add test file"
+  copy:
+    src: "phpinfo.php"
+    dest: "/var/www/html/phpinfo.php"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache

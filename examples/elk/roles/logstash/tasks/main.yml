@@ -1,0 +1,10 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config logstash"
+  template:
+    src: logstash-indexer.conf.j2
+    dest: /etc/logstash/conf.d/logstash-indexer.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart logstash

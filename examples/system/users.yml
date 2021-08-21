@@ -1,0 +1,43 @@
+---
+- hosts: testserver
+  
+  become: yes
+
+  vars:
+    # Vars for group
+    - group_name: bigdata
+    - group_id: 2000
+
+    # Vars for user
+    - user_mame: hadoop
+    - user_password: $6$MqH8ngcc$0O0t3OsT2irhQkw7e3mKGlpesTnvejT/T8C97DLSxRLt2WMkR/PJGKy0Dm/4VvuhM3YTPB/ksqduxQNkanvUz/
+    - user_comment: bigdata user
+    - user_groups: bigdata
+    - user_shell: /bin/bash
+    - user_id: 1010
+
+  tasks:
+    - name: "Create an additional group"
+      group:
+        name: "{{ group_name }}"
+        gid: "{{ group_id }}"
+        state: present
+
+    - name: "Create user"
+      user:
+        name: "{{ user_mame }}"
+        password: "{{ user_password }}"
+        comment: "{{ user_comment }}"
+        groups: "{{ user_groups }}"
+        append: yes
+        create_home: true
+        shell: "{{ user_shell }}"
+        uid: "{{ user_id }}"
+        state: present
+
+    - name: "Generate SSH key for the user"
+      user:
+        name: "{{ user_mame }}"
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa

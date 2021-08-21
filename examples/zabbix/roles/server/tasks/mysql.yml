@@ -1,0 +1,31 @@
+- name: "Install mysql_db module"
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+
+- name: "Create database"
+  mysql_db:
+    name: "{{ server_dbname }}"
+    state: present
+
+- name: "Create local user"
+  mysql_user:
+    name: "{{ server_dbuser }}"
+    password: "{{ server_dbpassword }}"
+    priv: "{{ server_dbname }}.*:ALL"
+    host: "{{ server_dbhost }}"
+    state: present
+
+- name: "Import database file"
+  shell: "if [ -f {{ item }}.sql.gz ]; then gunzip {{ item }}.sql.gz; fi && mysql -h '{{ server_dbhost }}' -u '{{ server_dbuser }}' -p'{{ server_dbpassword }}' -D '{{ server_dbname }}' < {{ item }}.sql && touch /etc/zabbix/import_{{ item }}.done"
+  args:
+    chdir: "{{ datafiles_path }}"
+    creates: "/etc/zabbix/import_{{ item }}.done"
+  with_items:
+    - schema
+    - images
+    - data

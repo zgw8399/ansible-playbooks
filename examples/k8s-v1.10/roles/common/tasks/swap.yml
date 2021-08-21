@@ -1,0 +1,11 @@
+- name: "Shut down the system swap"
+  shell: "swapoff -a && touch swapoff.done"
+  args:
+    chdir: /root
+    creates: swapoff.done
+
+- name: "Modify fstab file"
+  lineinfile:
+    path: /etc/fstab
+    regexp: '^/swapfile'
+    state: absent

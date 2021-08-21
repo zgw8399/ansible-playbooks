@@ -1,0 +1,10 @@
+---
+# default vars for apache role
+#
+# root dir
+#
+http_fileserver_path: /data/http_files
+#
+# vhost name
+#
+domain: http-fileserver

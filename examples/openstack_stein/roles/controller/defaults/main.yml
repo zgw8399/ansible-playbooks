@@ -1,0 +1,53 @@
+---
+# default vars for controller role
+#
+# NTP
+ntp_pools:
+  - cn.ntp.org.cn
+  - edu.ntp.org.cn
+
+# Memcached
+memory_size: 128
+
+# Keystone
+controller_host: controller-1
+db_host: 10.9.36.178
+keystone_dbpass: keystone
+admin_pass: admin
+admin_env: {
+  OS_PROJECT_DOMAIN_NAME: Default,
+  OS_USER_DOMAIN_NAME: Default,
+  OS_PROJECT_NAME: admin,
+  OS_USERNAME: admin,
+  OS_PASSWORD: admin,
+  OS_AUTH_URL: "http://controller-1:5000/v3",
+  OS_IDENTITY_API_VERSION: 3,
+  OS_IMAGE_API_VERSION: 2
+}
+
+# Placement
+placement_pass: placement
+placement_dbpass: placement
+
+# Glance
+glance_pass: glance
+glance_dbpass: glance
+glance_rbd_store_pool: test
+glance_rbd_store_user: admin
+
+# Nova
+nova_pass: nova
+nova_dbpass: nova
+rabbit_cluster: admin:admin@controller-1:5672,admin:admin@compute-1:5672,admin:admin@block-storage-1:5672
+
+# Neutron
+neutron_pass: neutron
+neutron_dhcp_agents_per_network: 1
+neutron_dbpass: neutron
+metadata_secret: admin
+
+# Dashboard
+
+# Cinder
+cinder_pass: cinder
+cinder_dbpass: cinder

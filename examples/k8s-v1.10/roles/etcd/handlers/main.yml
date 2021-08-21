@@ -1,0 +1,7 @@
+---
+# handlers file for etcd role
+#
+- name: restart etcd
+  service:
+    state: restarted
+    name: etcd

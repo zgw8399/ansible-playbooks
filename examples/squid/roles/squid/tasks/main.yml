@@ -1,0 +1,35 @@
+- import_tasks: ubuntu.yml
+
+- name: "Remove the lines in /etc/squid/squid.conf"
+  lineinfile:
+    path: /etc/squid/squid.conf
+    regexp: "^{{ item }}"
+    line: "#{{ item }}"
+    backrefs: yes
+  with_items:
+    - http_access deny !Safe_ports
+    - http_access deny CONNECT !SSL_ports
+    - http_access deny manager
+  notify: restart squid
+
+- name: "Create file of /etc/squid/passwdfile"
+  htpasswd:
+    path: /etc/squid/passwdfile
+    name: "{{ proxy_user_name }}"
+    password: "{{ proxy_user_password }}"
+    owner: proxy
+    group: proxy
+    mode: 0640
+  notify: restart squid
+
+- name: "Config auth"
+  lineinfile:
+    path: /etc/squid/squid.conf
+    regexp: "^{{ item }}"
+    insertbefore: "^http_access deny all"
+    line: "{{ item }}"
+  with_items:
+    - auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwdfile
+    - acl auth_user proxy_auth REQUIRED
+    - http_access allow auth_user
+  notify: restart squid

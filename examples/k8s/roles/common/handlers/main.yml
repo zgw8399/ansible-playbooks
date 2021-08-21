@@ -1,0 +1,9 @@
+---
+# handlers for common role
+#
+- name: restart docker
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

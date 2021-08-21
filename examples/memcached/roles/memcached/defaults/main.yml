@@ -1,0 +1,4 @@
+---
+# default vars file for memcached role
+#
+memory_size: 128

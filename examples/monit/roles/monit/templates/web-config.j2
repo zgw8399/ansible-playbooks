@@ -1,0 +1,5 @@
+set httpd port {{ httpd_port }} and
+    use address {{ httpd_address }}
+    allow 127.0.0.1
+    allow {{ allow_address }}
+    allow {{ httpd_user_pass }}

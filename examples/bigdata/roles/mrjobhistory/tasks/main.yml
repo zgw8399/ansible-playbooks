@@ -1,0 +1,5 @@
+- name: "Start MR Jobhistory daemon"
+  shell: "su - yarn -c 'mr-jobhistory-daemon.sh start historyserver' && touch start-mr-jobhistory.done"
+  args:
+    chdir: "{{ hadoop_home }}"
+    creates: start-mr-jobhistory.done

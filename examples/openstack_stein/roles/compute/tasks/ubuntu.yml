@@ -1,0 +1,25 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - chrony
+    - nova-compute
+    - python3-rbd
+    - python3-rados
+    - ceph-common
+    - neutron-openvswitch-agent
+    - neutron-dhcp-agent
+    - neutron-metadata-agent
+    - openvswitch-switch
+    - openvswitch-common
+    - openvswitch-switch-dpdk

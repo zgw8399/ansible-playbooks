@@ -1,0 +1,5 @@
+---
+# default vars for zookeeper role
+#
+data_dir: /var/lib/zookeeper
+zookeeper_bin_dir: /usr/share/zookeeper/bin

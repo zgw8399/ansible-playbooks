@@ -1,0 +1,32 @@
+---
+- hosts: testserver
+
+  become: true
+
+  vars:
+    - hostname_prefix: webserver
+
+  tasks:
+    - name: "Modify hostname"
+      hostname:
+        name: "{{ hostname_prefix }}-{{ ansible_default_ipv4.address.split('.')[-1] }}"
+
+    - name: "Get the current host name"
+      shell: hostname
+      register: result
+      changed_when: false
+
+    - name: "Display current host name"
+      debug: "msg='current hostname: {{ result.stdout }}'"
+
+    - name: "Add a host entry for the current hostname"
+      lineinfile:
+        path: /etc/hosts
+        insertafter: '^127\.0\.0\.1'
+        line: "{{ ansible_all_ipv4_addresses[0] }}  {{ result.stdout }}"
+
+    - name: "Delete entry 127.0.1.1"
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        state: absent

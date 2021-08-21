@@ -1,0 +1,37 @@
+- name: "Get apt management depend"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install general software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - wget
+    - apt-transport-https
+    - net-tools
+    - iftop
+    - tcpdump
+    - ceph-fuse
+    - chrony
+
+- name: "Install virtualization software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - qemu
+    - qemu-kvm
+    - libvirt-bin
+    - libvirt-daemon-system
+    - libvirt-clients
+    - qemu-block-extra
+    - vlan
+    - bridge-utils
+    - virtinst
+    - qemu-utils
+    - virt-goodies

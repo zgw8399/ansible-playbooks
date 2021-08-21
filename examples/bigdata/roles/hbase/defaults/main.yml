@@ -1,0 +1,16 @@
+---
+# default vars file for hbase role
+#
+java_home: /usr/lib/jvm/java-8-openjdk-amd64
+#
+hdfs_cluster_name: mycluster
+hadoop_conf_dir: /usr/local/hadoop/etc/hadoop
+#
+hbase_home: /usr/local/hbase 
+hbase_conf_dir: /usr/local/hbase/conf
+hbase_url: http://10.9.36.96/downloads/bigdata
+hbase_version: 2.1.4
+hbase_install_path: /usr/local
+hbase_zk_quorum: "bigdata-21,bigdata-22,bigdata-23"
+hbase_zk_clientport: 2181
+hbase_zk_datadir: /usr/local/hbase/zookeeper/data

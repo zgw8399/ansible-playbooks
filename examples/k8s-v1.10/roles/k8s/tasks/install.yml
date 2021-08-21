@@ -1,0 +1,19 @@
+- name: "Get binary file for k8s"
+  get_url:
+    url: "{{ kube_url }}/{{ kube_release }}/{{ item }}"
+    dest: "{{ kube_install_path }}/{{ item }}"
+    mode: 0755
+  with_items:
+    - kubelet
+    - kubectl
+
+- name: "Create dir for cni"
+  file:
+    path: "{{ cni_install_path }}"
+    state: directory
+
+- name: "Unarchive binary file for cni"
+  unarchive:
+    src: "{{ cni_url }}/{{ cni_bin_package }}"
+    dest: "{{ cni_install_path }}"
+    remote_src: yes
