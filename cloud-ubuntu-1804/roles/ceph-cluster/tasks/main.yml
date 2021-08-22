@@ -1,0 +1,19 @@
+- name: "Create the dir for storage-cluster"
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ storage_cluster_dir }}"
+
+- name: "Create a storage cluster"
+  shell: |
+    ceph-deploy new --public-network {{ public_network }} --cluster-network {{ cluster_network }} {{ mon_members }}
+  args:
+    chdir: "{{ storage_cluster_dir }}"
+    creates: ceph.conf
+
+- name: "Generate the storage cluster configuration"
+  template:
+    src: ceph.conf.j2
+    dest: "{{ storage_cluster_dir }}/ceph.conf"
+    backup: yes

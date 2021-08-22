@@ -1,0 +1,15 @@
+---
+- hosts:
+    - logging-server-filter1
+    - logging-server-filter2
+  become: true
+  pre_tasks:
+    - name: "Update apt cache"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+  roles:
+    - logstash
+  environment:
+    http_proxy: "http://test:test@10.60.11.15:3128"
+    https_proxy: "https://test:test@10.60.11.15:3128"

@@ -1,0 +1,83 @@
+- name: "Install software"
+  yum:
+    name:
+      - net-tools
+      - iftop
+      - tcpdump
+      - monit
+      - ntpdate
+      - bridge-utils
+      - vconfig
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+    state: present
+    enablerepo: "epel"
+
+- name: "Add modules"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 8021q
+
+- name: "Configure NTP"
+  template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+  notify: restart chrony
+  tags:
+    - ntp
+
+- name: "Configure net.ipv4.ip_forward"
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+
+- name: "Configure hosts"
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - hosts
+
+- name: "Create ceph deploy user"
+  user:
+    name: "{{ deploy_user_name }}"
+    uid: "{{ deploy_user_id }}"
+    password: "{{ deploy_user_password }}"
+    comment: "{{ deploy_user_comment }}"
+    append: yes
+    create_home: true
+    shell: "{{ deploy_user_shell }}"
+    state: present
+  tags:
+    - user
+
+- name: "Add sudo privilegus"
+  lineinfile:
+    path: "/etc/sudoers.d/{{ deploy_user_name }}"
+    line: "{{ deploy_user_name }} ALL = (root) NOPASSWD:ALL"
+    owner: root
+    group: root
+    mode: 0440
+    create: yes
+  tags:
+    - user
+
+- name: "Set the authorization key"
+  authorized_key:
+    user: "{{ deploy_user_name }}"
+    state: present
+    key: "{{ lookup('file', '/home/{{ local_user }}/.ssh/id_rsa.pub') }}"
+    path: "/home/{{ deploy_user_name }}/.ssh/authorized_keys"
+    manage_dir: false
+  tags:
+    - user

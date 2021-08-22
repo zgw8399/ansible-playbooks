@@ -1,0 +1,21 @@
+---
+# common
+k8s_package_version: 1.16.2-00
+sysctl_file: /etc/sysctl.d/k8s.conf
+
+# kubeadm init
+k8s_apiserver1: 10.60.11.2
+k8s_apiserver2: 10.60.11.18
+k8s_apiserver3: 10.60.11.4
+node_taint_effect: PreferNoSchedule
+
+# cluster config
+enable_admission_plugins: AlwaysPullImages,DefaultStorageClass
+image_repo: 10.60.11.1/google_containers
+k8s_version: v1.16.2
+control_plane_endpoint: 10.60.11.200:8443
+pod_subnet: 192.168.0.0/16
+
+# kubelet config
+cgroup_driver: systemd
+fail_swap_on: false

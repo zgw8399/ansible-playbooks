@@ -1,0 +1,24 @@
+---
+# vars for all groups
+#
+# Vlan
+vlan_ids:
+  - 33
+  - 40
+  - 999
+  - 3018
+
+# NTP
+ntp_servers:
+  - 192.168.5.200
+
+# Storage
+ceph_cluster_conf_dir: /home/keda/kedaceph-cluster
+ceph_conf_dir: /etc/ceph
+cephfs_mount_dir: /kedacephfs
+
+# Container
+docker_deb_url: "http://10.9.44.11/downloads/docker-ce_18.06.1~ce~3-0~debian_amd64.deb"
+insecure_registries: 0.0.0.0/0
+data_root: /var/lib/docker
+storage_driver: overlay2

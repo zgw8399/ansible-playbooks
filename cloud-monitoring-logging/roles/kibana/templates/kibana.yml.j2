@@ -1,0 +1,5 @@
+server.port: {{ kibana_server_port }}
+server.host: {{ kibana_server_host }}
+elasticsearch.hosts: ["http://{{ es_host1 }}:9200","http://{{ es_host2 }}:9200","http://{{ es_host3 }}:9200"]
+kibana.index: {{ kibana_index }}
+i18n.locale: "zh-CN"

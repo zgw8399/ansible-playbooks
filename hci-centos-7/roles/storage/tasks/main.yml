@@ -1,0 +1,37 @@
+- name: "Configure monit"
+  template:
+    src: /etc/monitrc
+    dest: /etc/monitrc
+  notify:
+    - restart monit
+
+- name: "Add monit config file"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/monit.d/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - kedacephfs
+  notify:
+    - restart monit
+
+- name: "Create monit script directory"
+  file:
+    state: directory
+    path: /etc/monit.d/scripts
+  notify:
+    - restart monit
+
+- name: "Add monit script file"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/monit.d/scripts/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+    - check-kedacephfs.sh
+  notify:
+    - restart monit

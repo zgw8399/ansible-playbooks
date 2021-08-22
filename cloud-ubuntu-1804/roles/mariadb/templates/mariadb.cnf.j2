@@ -1,0 +1,53 @@
+[client]
+
+default-character-set = utf8
+
+[mysqld]
+
+# Common Configuration
+
+datadir = {{ data_dir }}
+bind-address = {{ ansible_eno3.ipv4.address }}
+binlog_format=ROW
+collation-server = utf8_general_ci
+character-set-server = utf8
+skip-name-resolve
+max_connections={{ mysqld_max_connections }}
+max_allowed_packet={{ mysqld_max_allowed_packet }}
+thread_cache_size={{ mysqld_thread_cache_size }}
+connect_timeout={{ mysqld_connect_timeout }}
+net_read_timeout={{ mysqld_net_read_timeout }}
+net_write_timeout={{ mysqld_net_write_timeout }}
+
+# InnoDB Configuration
+
+default-storage-engine = innodb
+innodb_file_per_table
+innodb_autoinc_lock_mode=2
+innodb_flush_log_at_trx_commit=0
+sync_binlog=0
+innodb_buffer_pool_size={{ buffer_pool_size }}
+innodb_doublewrite=1
+innodb_log_file_size={{ log_file_size }}
+innodb_flush_method=O_DIRECT
+innodb_buffer_pool_instances={{ buffer_pool_instances }}
+innodb_thread_concurrency={{ thread_concurrency }}
+innodb_io_capacity={{ io_capacity }}
+innodb_stats_on_metadata=OFF
+
+# Galera Cluster Configuration
+
+wsrep_provider={{ provider }}
+wsrep_provider_options={{ provider_options }}
+wsrep_cluster_name={{ cluster_name }}
+{% if node_role == 'first' %}
+wsrep_cluster_address="gcomm://{{ cluster_address }}"
+{% elif node_role == 'other' %}
+wsrep_cluster_address="gcomm://{{ cluster_address }}"
+{% endif %}
+wsrep_sst_method={{ sst_method }}
+wsrep_node_name={{ ansible_hostname }}
+wsrep_node_address={{ ansible_eno3.ipv4.address }}
+wsrep_sst_auth={{ sst_auth }}
+wsrep_on=ON
+wsrep_slave_threads={{ slave_threads }}

@@ -1,0 +1,17 @@
+- name: "Add 802.1q module"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 8021q
+    - rbd
+
+- name: "Load module at startup"
+  lineinfile:
+    path: /etc/modules
+    state: present
+    regexp: "{{ item }}"
+    line: "{{ item }}"
+  with_items:
+    - 8021q
+    - rbd

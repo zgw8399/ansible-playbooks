@@ -1,0 +1,73 @@
+- import_tasks: ubuntu.yml
+
+- name: "Modify the /lib/systemd/system/mariadb.service file to change the value of ProtectHome to false"
+  lineinfile:
+    path: /lib/systemd/system/mariadb.service
+    regexp: '^ProtectHome='
+    line: 'ProtectHome=false'
+  tags:
+    - mariadb
+
+- name: "Config mariadb for the first node"
+  template:
+    src: "mariadb.cnf.j2"
+    dest: "/etc/mysql/mariadb.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  when: node_role == "first"
+  run_once: true
+  delegate_to: "{{ mariadb_cluster_first_node }}"
+  tags:
+    - mariadb
+    - configure
+
+- name: "Initialize the cluster on the first node"
+  shell: "service mysql stop && systemctl daemon-reload && service mysql start --wsrep-new-cluster && touch init-cluster.done"
+  args:
+    chdir: /etc/mysql
+    creates: init-cluster.done
+  when: node_role == "first"
+  run_once: true
+  delegate_to: "{{ mariadb_cluster_first_node }}"
+  tags:
+    - mariadb
+
+- name: "Config mariadb for the other nodes"
+  template:
+    src: "mariadb.cnf.j2"
+    dest: "/etc/mysql/mariadb.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  when: node_role == "other"
+  tags:
+    - mariadb
+    - configure
+
+- name: "Create a local health-check user"
+  mysql_user:
+    name: "{{ health_check_user }}"
+    password: "{{ health_check_password }}"
+    priv: "*.*:ALL"
+    state: present
+  when: node_role == "first"
+  run_once: true
+  delegate_to: "{{ mariadb_cluster_first_node }}"
+  tags:
+    - mariadb
+
+- name: "Configure xinetd for mariadb cluster monitor"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: "clustercheck.j2", dest: "/usr/bin/clustercheck", mode: "0755" }
+    - { src: "galera-monitor.j2", dest: "/etc/xinetd.d/galera-monitor", mode: "0644" }
+  notify:
+    - restart xinetd
+  tags:
+    - mariadb

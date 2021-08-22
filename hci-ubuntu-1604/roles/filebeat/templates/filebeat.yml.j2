@@ -1,0 +1,400 @@
+#=========================== Filebeat inputs =============================
+
+filebeat.inputs:
+
+# syslog
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/syslog
+  fields:
+    log_source: syslog
+  tags: ["syslog"]
+  exclude_lines: ['.*systemd\[\d+\].*','.*systemd-resolved\[\d+\].*','.*ansible-.*','.*filebeat\[\d+\].*']
+
+# cloud-storage
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph.log
+  fields:
+    log_source: ceph
+  tags: ["cloud-storage","ceph"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph.audit.log
+  fields:
+    log_source: ceph-audit
+  tags: ["cloud-storage","ceph-audit"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph-mds.*.log
+  fields:
+    log_source: ceph-mds
+  tags: ["cloud-storage","ceph-mds"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph-osd.*.log
+  fields:
+    log_source: ceph-osd
+  tags: ["cloud-storage","ceph-osd"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph-mon.*.log
+  fields:
+    log_source: ceph-mon
+  tags: ["cloud-storage","ceph-mon"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/ceph/ceph-mgr.*.log
+  fields:
+    log_source: ceph-mgr
+  tags: ["cloud-storage","ceph-mgr"]
+
+# cloud-basic
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/haproxy.log
+  fields:
+    log_source: haproxy
+  tags: ["cloud-basic","haproxy"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/pacemaker.log
+  fields:
+    log_source: pacemaker
+  tags: ["cloud-basic","pacemaker"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/pcsd/pcsd.log
+  fields:
+    log_source: pcsd
+  tags: ["cloud-basic","pcsd"]
+  multiline.pattern: ^10.*|^-.*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/rabbitmq/rabbit@*.log
+    - /var/log/rabbitmq/rabbit@*-sasl.log
+  fields:
+    log_source: rabbitmq
+  tags: ["cloud-basic","rabbitmq"]
+
+# cloud-controller
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-api.log
+  fields:
+    log_source: nova-api
+  tags: ["nova-api","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-conductor.log
+  fields:
+    log_source: nova-conductor
+  tags: ["nova-conductor","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-consoleauth.log
+  fields:
+    log_source: nova-consoleauth
+  tags: ["nova-consoleauth","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-novncproxy.log
+  fields:
+    log_source: nova-novncproxy
+  tags: ["nova-novncproxy","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-scheduler.log
+  fields:
+    log_source: nova-scheduler
+  tags: ["nova-scheduler","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/glance/glance-api.log
+  fields:
+    log_source: glance-api
+  tags: ["glance-api","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/cinder/cinder-scheduler.log
+  fields:
+    log_source: cinder-scheduler
+  tags: ["cinder-scheduler","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/keystone/keystone-wsgi-public.log
+  fields:
+    log_source: keystone-wsgi-public
+  tags: ["keystone-wsgi-public","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/keystone/keystone-manage.log
+  fields:
+    log_source: keystone-manage
+  tags: ["keystone-manage","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/neutron/neutron-server.log
+  fields:
+    log_source: neutron-server
+  tags: ["neutron-server","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/access.log
+  fields:
+    log_source: horizon
+  tags: ["horizon","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/cinder.log
+  fields:
+    log_source: cinder-api
+  tags: ["cinder-api","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/keystone_access.log
+  fields:
+    log_source: keystone-api
+  tags: ["keystone-api","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/nova_placement_access.log
+  fields:
+    log_source: nova-placement-api
+  tags: ["nova-placement-api","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/error.log
+  fields:
+    log_source: horizon-error
+  tags: ["horizon-error","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/keystone.log
+  fields:
+    log_source: keystone-api-error
+  tags: ["keystone-api-error","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/nova_placement_error.log
+  fields:
+    log_source: nova-placement-api-error
+  tags: ["nova-placement-api-error","cloud-controller"]
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/apache2/cinder_error.log
+  fields:
+    log_source: cinder-api-error
+  tags: ["cinder-api-error","cloud-controller"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+# compute-node
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nova/nova-compute.log
+  fields:
+    log_source: nova-compute
+  tags: ["nova-compute","compute-node"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/neutron/neutron-dhcp-agent.log
+  fields:
+    log_source: neutron-dhcp-agent
+  tags: ["neutron-dhcp-agent","compute-node"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/neutron/neutron-metadata-agent.log
+  fields:
+    log_source: neutron-metadata-agent
+  tags: ["neutron-metadata-agent","compute-node"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/neutron/neutron-openvswitch-agent.log
+    - /var/log/neutron/neutron-ovs-cleanup.log
+  fields:
+    log_source: neutron-openvswitch-agent
+  tags: ["neutron-openvswitch-agent","compute-node"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/openvswitch/ovsdb-server.log
+    - /var/log/openvswitch/ovs-vswitchd.log
+  fields:
+    log_source: openvswitch
+  tags: ["openvswitch","compute-node"]
+
+# block-storage-node
+
+- type: log
+  enabled: true
+  paths:
+    - /var/log/cinder/cinder-volume.log
+  fields:
+    log_source: cinder-volume
+  tags: ["cinder-volume","block-storage-node"]
+  exclude_lines: ['^.*oslo_db.sqlalchemy.engines\s$']
+  multiline.pattern: .*(Traceback|engines[[:space:]]{2,}|engines DBConnectionError).*
+  multiline.negate: false
+  multiline.match: after
+
+#============================= Filebeat modules ===============================
+
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+#==================== Elasticsearch template setting ==========================
+
+setup.template.settings:
+  index.number_of_shards: {{ index_number_of_shards }}
+
+#================================ General =====================================
+
+tags: ["cloud"]
+
+fields:
+  env: production
+
+#============================== Kibana =====================================
+
+setup.kibana:
+  host: "{{ kibana_host_ip }}"
+
+#================================ Outputs =====================================
+
+output.logstash:
+  hosts: ["{{ logstash_host1_ip }}:5044","{{ logstash_host2_ip }}:5044"]
+
+#================================ Processors =====================================
+
+processors:
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~

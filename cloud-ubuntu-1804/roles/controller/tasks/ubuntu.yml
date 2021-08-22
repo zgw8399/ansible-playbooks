@@ -1,0 +1,50 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - python-memcache
+    - keystone
+    - apache2
+    - libapache2-mod-wsgi
+    - mariadb-client
+    - python-pip
+    - python-virtualenv
+    - python-setuptools
+    - glance
+    - python-rbd
+    - python-rados
+    - ceph-common
+    - nova-api
+    - nova-conductor
+    - nova-novncproxy
+    - nova-scheduler
+    - nova-consoleauth
+    - nova-placement-api
+    - neutron-server
+    - neutron-plugin-ml2
+    - openstack-dashboard
+    - cinder-api
+    - cinder-scheduler
+  tags:
+    - install
+
+- name: "Install Python library"
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - shade
+  tags:
+    - pip

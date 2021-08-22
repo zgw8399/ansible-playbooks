@@ -1,0 +1,113 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - server
+
+- name: "Install zabbix-server"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-server-mysql
+    - zabbix-frontend-php
+    - php-mysql
+  tags:
+    - server
+
+- name: "Enable zabbix-server service"
+  shell: "systemctl enable zabbix-server.service && touch enable_zabbix_server.done"
+  args:
+    chdir: /etc/zabbix
+    creates: "enable_zabbix_server.done"
+  tags:
+    - server
+
+- name: "Install mysql_db module"
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+  tags:
+    - server
+
+- name: "Create database"
+  mysql_db:
+    name: "{{ zabbix_server_dbname }}"
+    state: present
+  tags:
+    - server
+
+- name: "Create local user"
+  mysql_user:
+    name: "{{ zabbix_server_dbuser }}"
+    password: "{{ zabbix_server_dbpassword }}"
+    priv: "{{ zabbix_server_dbname }}.*:ALL"
+    host: "{{ zabbix_server_dbhost }}"
+    state: present
+  tags:
+    - server
+
+- name: "Create remote user"
+  mysql_user:
+    name: "{{ zabbix_server_dbuser }}"
+    password: "{{ zabbix_server_dbpassword }}"
+    priv: "{{ zabbix_server_dbname }}.*:ALL"
+    host: "%"
+    state: present
+  tags:
+    - server
+
+- name: "Import schema database file"
+  shell: "if [ -f schema.sql.gz ]; then gunzip schema.sql.gz; fi && mysql -h '{{ zabbix_server_dbhost }}' -u '{{ zabbix_server_dbuser }}' -p'{{ zabbix_server_dbpassword }}' -D '{{ zabbix_server_dbname }}' < schema.sql && touch /etc/zabbix/import_schema.done"
+  args:
+    chdir: "{{ zabbix_server_datafile_path }}"
+    creates: "/etc/zabbix/import_schema.done"
+  tags:
+    - server
+
+- name: "Import images database file"
+  shell: "if [ -f images.sql.gz ]; then gunzip images.sql.gz; fi && mysql -h '{{ zabbix_server_dbhost }}' -u '{{ zabbix_server_dbuser }}' -p'{{ zabbix_server_dbpassword }}' -D '{{ zabbix_server_dbname }}' < images.sql && touch /etc/zabbix/import_images.done"
+  args:
+    chdir: "{{ zabbix_server_datafile_path }}"
+    creates: "/etc/zabbix/import_images.done"
+  tags:
+    - server
+
+- name: "Import data database file"
+  shell: "if [ -f data.sql.gz ]; then gunzip data.sql.gz; fi && mysql -h '{{ zabbix_server_dbhost }}' -u '{{ zabbix_server_dbuser }}' -p'{{ zabbix_server_dbpassword }}' -D '{{ zabbix_server_dbname }}' < data.sql && touch /etc/zabbix/import_data.done"
+  args:
+    chdir: "{{ zabbix_server_datafile_path }}"
+    creates: "/etc/zabbix/import_data.done"
+  tags:
+    - server
+
+- name: "Config zabbix-server"
+  template:
+    src: zabbix_server.conf.j2
+    dest: /etc/zabbix/zabbix_server.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-server
+  tags:
+    - server
+
+- name: "Config zabbix-web-gui"
+  template:
+    src: zabbix-frontend-php.conf.j2
+    dest: /etc/apache2/conf-available/zabbix-frontend-php.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload apache2
+  tags:
+    - server

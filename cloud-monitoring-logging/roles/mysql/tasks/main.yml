@@ -1,0 +1,44 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Install mysql-server"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - mysql-server-5.7
+    - python-mysqldb
+    - python-pymysql
+  tags:
+    - install
+
+- name: "Config apparmor"
+  template:
+    src: usr.sbin.mysqld.j2
+    dest: /etc/apparmor.d/usr.sbin.mysqld
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart apparmor
+  tags:
+    - config
+
+- name: "Config mysql-server"
+  template:
+    src: mysqld.cnf.j2
+    dest: /etc/mysql/mysql.conf.d/mysqld.cnf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart mysql
+  tags:
+    - config

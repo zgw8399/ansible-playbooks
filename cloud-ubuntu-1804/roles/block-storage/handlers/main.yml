@@ -1,0 +1,16 @@
+---
+# handlers for block-storage role
+#
+- name: stop cinder-volume
+  systemd:
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+    name: cinder-volume
+
+- name: restart cinder-backup
+  systemd:
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+    name: cinder-backup

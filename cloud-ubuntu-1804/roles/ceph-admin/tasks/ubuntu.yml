@@ -1,0 +1,17 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Installing ceph software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python
+    - ceph-deploy
+    - ceph-common
+    - ceph-base

@@ -1,0 +1,176 @@
+---
+## ceph deploy
+
+deploy_user_name: cephadmin
+deploy_user_id: 1100
+# generate password command: "mkpasswd --method=sha-512"
+deploy_user_password: "$6$bmLa4NyPpI$ZJIB3MDt5CaZ2zE/aMZQRVECr51MODfoHoLa/ShlxD6nCihN5SpfBmQhzy9b3tpPZm92.4gPdaEGlSVKBwMm8/"
+deploy_user_comment: "Ceph Deploy User"
+deploy_user_shell: /bin/bash
+local_user: keda
+ceph_conf_dir: /etc/ceph
+
+## storage cluster
+
+storage_cluster_dir: ~/kedacloud-storage
+public_network: 10.60.11.0/24
+cluster_network: 10.60.12.0/24
+mon_members: "C1-M620-16 C2-M620-15 C2-M620-16"
+mon_initial_members: "C1-M620-16,C2-M620-15,C2-M620-16"
+mon_hosts: "10.60.11.16,10.60.11.31,10.60.11.32"
+osd_journal_size: 10240
+osd_pool_default_size: 3
+osd_pool_default_min_size: 2
+osd_pool_default_pg_num: 8
+osd_pool_default_pgp_num: 8
+# valid value: 0/1/2/3
+osd_crush_chooseleaf_type: 1
+osd_pool_default_crush_rule: -1
+mon_osd_full_ratio: ".80"
+mon_osd_nearfull_ratio: ".70"
+osd_backfill_full_ratio: ".75"
+osd_max_backfills: 1
+mon_clock_drift_allowed: 2
+mon_clock_drift_warn_backoff: 10
+mon_allow_pool_delete: "false"
+osd_scrub_begin_hour: 22
+osd_scrub_end_hour: 7
+
+## HA cluster
+
+# pacemaker
+# generate password command: "mkpasswd --method=sha-512"
+hacluster_pass: "$6$fB3CUYlDhIc/qNRc$tg3GiD.SdgxiV.kWO2O2DM7fyIBSdTklfx2iaOCrSDTmpxVZrNAtf7t.JZpD3Qi3nITlF8S6bTbSJ6DdzNAoz1"
+ha_cluster_name: openstack-controller-cluster
+interface_bind_net_addr: 10.60.13.0
+node1_ring0_addr: controller-1
+node2_ring0_addr: controller-2
+node3_ring0_addr: controller-3
+
+# haproxy
+haproxy_admin_user: admin
+haproxy_admin_pass: kedahaadmin499
+os_controller_vip: 10.60.13.100
+os_controller_node_1: 10.60.13.16
+os_controller_node_2: 10.60.13.31
+os_controller_node_3: 10.60.13.32
+mariadb_health_check_port: 9200
+
+## mariadb cluster
+
+data_dir: /var/lib/mysql
+mysqld_max_connections: 4096
+mysqld_max_allowed_packet: 4M
+mysqld_thread_cache_size: 16
+mysqld_connect_timeout: 15
+mysqld_net_read_timeout: 45
+mysqld_net_write_timeout: 90
+
+# for innodb configuration
+buffer_pool_size: 8192M
+log_file_size: 512M
+buffer_pool_instances: 12
+thread_concurrency: 12
+io_capacity: 300
+
+# for galera cluster configuration
+provider: /usr/lib/libgalera_smm.so
+provider_options: "pc.recovery=TRUE;gcache.size=600M"
+cluster_name: openstack_mariadb_cluster
+cluster_address: "10.60.13.16,10.60.13.31,10.60.13.32"
+mariadb_cluster_first_node: C1-M620-16
+sst_method: rsync
+sst_auth: "wsrep:keda600499"
+slave_threads: 8
+
+# health check
+health_check_user: clustercheck
+health_check_password: clustercheck
+health_check_port: 9200
+
+## openstack databases
+
+remote_access_hosts: "%"
+keystone_dbpass: keda#keystone
+glance_dbpass: keda#glance
+nova_dbpass: keda#nova
+neutron_dbpass: keda#neutron
+cinder_dbpass: keda#cinder
+
+## rabbitmq cluster
+
+erlang_cookie: QJPTXPIJRCOVPBKIQTFU
+rabbitmq_first_node: C1-M620-16
+rabbitmq_first_node_ip: C1-M620-16
+rabbitmq_admin_user: admin
+rabbitmq_admin_pass: kedarabbitmq499
+
+## memcached cluster
+
+memory_size: 8192
+
+## openstack controller
+
+os_release: queens
+os_db_host: 10.60.13.100
+os_memcached_servers: "10.60.13.16:11211,10.60.13.31:11211,10.60.13.32:11211"
+rabbit_cluster: "admin:kedarabbitmq499@10.60.13.16:5672,admin:kedarabbitmq499@10.60.13.31:5672,admin:kedarabbitmq499@10.60.13.32:5672"
+
+# Keystone
+controller_first_node: C1-M620-16
+os_admin_pass: keda#osadmin#499
+os_admin_env: {
+  OS_PROJECT_DOMAIN_NAME: Default,
+  OS_USER_DOMAIN_NAME: Default,
+  OS_PROJECT_NAME: admin,
+  OS_USERNAME: admin,
+  OS_PASSWORD: "keda#osadmin#499",
+  OS_AUTH_URL: "http://10.60.13.100:5000/v3",
+  OS_IDENTITY_API_VERSION: 3,
+  OS_IMAGE_API_VERSION: 2
+}
+keystone_token_cache_time: 450
+
+# Placement
+placement_pass: keda#placement
+
+# Glance
+glance_pass: keda#glance
+glance_rbd_store_pool: images
+glance_rbd_store_user: admin
+
+# Nova
+nova_pass: keda#nova
+
+# Neutron
+neutron_pass: keda#neutron
+neutron_dhcp_agents_per_network: 2
+metadata_secret: keda#meta
+
+# Cinder
+cinder_pass: keda#cinder
+
+## openstack compute
+
+# nova-compute
+ceph_client_admin_key: "AQBbq1td9Nb9LhAAuC0YGkk+zANksaprfVeHww=="
+ceph_rbd_user: admin
+secret_uuid: "677f9afe-b86c-4c9d-9ba7-9ae6478e3a73"
+libvirt_virt_type: kvm
+vms_rbd_pool: vms
+
+# neutron
+provider_interface: eno4
+
+## openstack block storage
+cinder_volume_host: cinder-cluster-1
+cinder_rbd_pool: volumes
+cinder_backup_rbd_pool: backups
+
+## monitoring
+zabbix_server_address: 10.60.101.4
+zabbix_server_active: 10.60.101.4
+mariadb_monitoring_user: "zabbix"
+mariadb_monitoring_password: "keda#monadmin"
+
+## End

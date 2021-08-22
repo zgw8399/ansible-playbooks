@@ -1,0 +1,19 @@
+- name: "Remove ntp pool"
+  lineinfile:
+    path: /etc/chrony/chrony.conf
+    regexp: "^pool"
+    state: absent
+  notify: restart chrony
+  tags:
+    - ntp
+
+- name: "Add ntp servers"
+  lineinfile:
+    path: /etc/chrony/chrony.conf
+    regexp: "^server {{ item }}"
+    insertafter: EOF
+    line: "server {{ item }} iburst"
+  with_items: "{{ ntp_servers }}"
+  notify: restart chrony
+  tags:
+    - ntp

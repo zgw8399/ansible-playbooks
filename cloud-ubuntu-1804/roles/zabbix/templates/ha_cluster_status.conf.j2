@@ -1,0 +1,9 @@
+# HA cluster
+UserParameter=ha.cluster.dc.node.name,sudo crm_mon -1 | grep -w "Current DC:" | awk '{print $3}'
+UserParameter=ha.cluster.nodes.count,sudo crm_mon -1 | grep -w "nodes configured" | awk '{print $1}'
+UserParameter=ha.cluster.resources.count,sudo crm_mon -1 | grep -w "resources configured" | awk '{print $1}'
+UserParameter=ha.cluster.online.nodes.count,sudo crm_mon -1 | grep -w "Online:" | grep -o controller | wc -l
+UserParameter=ha.cluster.offline.nodes.count,sudo crm_mon -1 | grep -w "Offline:" | grep -o controller | wc -l
+UserParameter=ha.cluster.vip.node.name,sudo crm_mon -1 | grep -w "vip_100" | awk '{print $NF}'
+# Cinder volume
+UserParameter=ha.cluster.cinder.volume.node.name,sudo crm_mon -1 | grep -w "cinder-volume" | awk '{print $NF}'

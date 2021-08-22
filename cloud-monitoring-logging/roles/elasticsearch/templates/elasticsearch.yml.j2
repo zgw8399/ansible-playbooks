@@ -1,0 +1,7 @@
+cluster.name: {{ es_cluster_name }}
+node.name: {{ ansible_hostname }}
+path.data: {{ es_path_data }}
+path.logs: {{ es_path_logs }}
+network.host: {{ es_network_host }}
+discovery.seed_hosts: ["{{ es_host1 }}","{{ es_host2 }}","{{ es_host3 }}"]
+cluster.initial_master_nodes: ["{{ es_host1 }}","{{ es_host2 }}","{{ es_host3 }}"]

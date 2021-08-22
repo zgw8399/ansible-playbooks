@@ -1,0 +1,82 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - proxy
+
+- name: "Install zabbix-proxy"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-proxy-mysql
+    - php-mysql
+  tags:
+    - proxy
+
+- name: "Enable zabbix-proxy service"
+  shell: "systemctl enable zabbix-proxy.service && touch enable_zabbix_proxy.done"
+  args:
+    chdir: /etc/zabbix
+    creates: "enable_zabbix_proxy.done"
+  tags:
+    - proxy
+
+- name: "Install mysql_db module"
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+  tags:
+    - proxy
+
+- name: "Create database"
+  mysql_db:
+    name: "{{ zabbix_proxy_dbname }}"
+    state: present
+  tags:
+    - proxy
+
+- name: "Create local user"
+  mysql_user:
+    name: "{{ zabbix_proxy_dbuser }}"
+    password: "{{ zabbix_proxy_dbpassword }}"
+    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
+    host: "{{ zabbix_proxy_dbhost }}"
+    state: present
+  tags:
+    - proxy
+
+- name: "Create remote user"
+  mysql_user:
+    name: "{{ zabbix_proxy_dbuser }}"
+    password: "{{ zabbix_proxy_dbpassword }}"
+    priv: "{{ zabbix_proxy_dbname }}.*:ALL"
+    host: "%"
+    state: present
+  tags:
+    - proxy
+
+- name: "Import schema database file"
+  shell: "if [ -f schema.sql.gz ]; then gunzip schema.sql.gz; fi && mysql -h '{{ zabbix_proxy_dbhost }}' -u '{{ zabbix_proxy_dbuser }}' -p'{{ zabbix_proxy_dbpassword }}' -D '{{ zabbix_proxy_dbname }}' < schema.sql && touch /etc/zabbix/import_schema.done"
+  args:
+    chdir: "{{ zabbix_proxy_datafile_path }}"
+    creates: "/etc/zabbix/import_schema.done"
+  tags:
+    - proxy
+
+- name: "Config zabbix-proxy"
+  template:
+    src: zabbix_proxy.conf.j2
+    dest: /etc/zabbix/zabbix_proxy.conf
+  notify:
+    - restart zabbix-proxy
+  tags:
+    - proxy

@@ -1,0 +1,44 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - agent
+    - agent4
+
+- name: "Install zabbix-agent"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-agent
+  tags:
+    - agent
+    - agent4
+
+- name: "Configuring zabbix-agent"
+  template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-agent
+  tags:
+    - agent
+
+- name: "Configuring zabbix-agent"
+  template:
+    src: zabbix_agentd.4.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart zabbix-agent
+  tags:
+    - agent4

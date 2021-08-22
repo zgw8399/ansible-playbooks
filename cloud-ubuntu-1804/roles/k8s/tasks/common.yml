@@ -1,0 +1,67 @@
+- name: "Add some modules"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - br_netfilter
+    - ip_vs
+    - ip_vs_rr
+    - ip_vs_wrr
+    - ip_vs_sh
+    - nf_conntrack
+  tags:
+    - common
+
+- name: "Load module at startup"
+  template:
+    src: modules.j2
+    dest: /etc/modules
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - common
+
+- name: "Set net.ipv4.ip_forward"
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: "{{ sysctl_file }}"
+  tags:
+    - common
+
+- name: "Set net.bridge.bridge-nf-call-iptables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: "{{ sysctl_file }}"
+  tags:
+    - common
+
+- name: "Set net.bridge.bridge-nf-call-ip6tables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: "{{ sysctl_file }}"
+  tags:
+    - common
+
+- name: "Set vm.swappiness"
+  sysctl:
+    name: vm.swappiness
+    value: 0
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: "{{ sysctl_file }}"
+  tags:
+    - common

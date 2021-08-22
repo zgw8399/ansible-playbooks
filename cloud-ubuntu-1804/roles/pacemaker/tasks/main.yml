@@ -1,0 +1,28 @@
+- import_tasks: ubuntu.yml
+
+- name: "Set the hacluster user password"
+  user:
+    name: hacluster
+    password: "{{ hacluster_pass }}"
+    state: present
+
+- name: "Set net.ipv4.ip_nonlocal_bind"
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+
+- name: "Configure corosync"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/corosync/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - corosync.conf
+  notify:
+    - restart corosync

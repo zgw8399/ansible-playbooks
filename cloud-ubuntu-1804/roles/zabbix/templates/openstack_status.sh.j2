@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# This script is used to detect the status of the openstack service.
+#
+# Setting environment variables
+#
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=keda#osadmin#499
+export OS_AUTH_URL=http://10.60.13.100:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+#
+# Defining function.
+#
+keystone_service_status(){
+  $(which openstack) token issue &>/dev/null
+  if [ $? -eq 0 ];then
+    echo 1
+  else
+    echo 0
+  fi
+}
+#
+glance_service_status(){
+  $(which openstack) image list &>/dev/null
+  if [ $? -eq 0 ];then
+    echo 1
+  else
+    echo 0
+  fi
+}
+#
+nova_service_status(){
+  $(which nova) service-list | grep -w "$1" | grep -o 'up' | wc -l
+}
+#
+neutron_service_status(){
+  $(which openstack) network agent list | grep -w "$1" | grep -o 'UP' | wc -l
+}
+#
+cinder_service_status(){
+  $(which cinder) service-list | grep -w "$1" | grep -o 'up' | wc -l
+}
+#
+# Main program.
+#
+case $1 in
+  keystone)
+    keystone_service_status ;;
+  glance)
+    glance_service_status ;;
+  consoleauth)
+    nova_service_status $1 ;;
+  nova-scheduler)
+    nova_service_status $1 ;;
+  conductor)
+    nova_service_status $1 ;;
+  compute)
+    nova_service_status $1 ;;
+  DHCP)
+    neutron_service_status $1 ;;
+  Metadata)
+    neutron_service_status $1 ;;
+  vSwitch)
+    neutron_service_status $1 ;;
+  cinder-scheduler)
+    cinder_service_status $1 ;;
+  volume)
+    cinder_service_status $1 ;;
+  *)
+    echo "Usage: $0 { keystone | glance | consoleauth | nova-scheduler | conductor | compute | DHCP | Metadata | vSwitch | cinder-scheduler | volume }" ;;
+esac
+#
+# End of script.

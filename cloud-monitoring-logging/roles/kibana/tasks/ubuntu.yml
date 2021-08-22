@@ -1,0 +1,16 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install kibana"
+  apt:
+    deb: "{{ kibana_deb_url }}" 
+
+- name: "Install nginx"
+  apt:
+    name: nginx
+    state: present

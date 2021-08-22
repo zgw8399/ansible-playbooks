@@ -1,0 +1,16 @@
+---
+# handlers for haproxy role
+#
+- name: restart haproxy
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: haproxy
+    enabled: yes
+
+- name: reload haproxy
+  systemd:
+    state: reloaded
+    daemon_reload: yes
+    name: haproxy
+    enabled: yes

@@ -1,0 +1,4 @@
+check program kedacephfs with path "/bin/bash /etc/monit/scripts/check-kedacephfs.sh" timeout 60 seconds
+start program = "/usr/bin/ceph-fuse {{ cephfs_mount_dir }}" with timeout 60 seconds
+if status != 0 then alert
+if status == 1 then start

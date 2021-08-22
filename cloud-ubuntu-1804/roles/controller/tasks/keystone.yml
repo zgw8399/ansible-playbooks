@@ -1,0 +1,220 @@
+## Keystone Service ##
+
+- name: "Configure keystone"
+  template:
+    src: keystone.conf.j2
+    dest: /etc/keystone/keystone.conf
+    owner: keystone
+    group: keystone
+    mode: '0644'
+  tags:
+    - keystone
+
+- name: "Import keystone data"
+  shell: |
+    su -s /bin/sh -c "keystone-manage db_sync" keystone && \
+    touch import_data.done
+  args:
+    chdir: /etc/keystone
+    creates: import_data.done
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone
+
+- name: "Setup fernet and credential for keystone vip"
+  shell: |
+    keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone && \
+    keystone-manage credential_setup --keystone-user keystone --keystone-group keystone && \
+    keystone-manage bootstrap --bootstrap-password {{ os_admin_pass }} --bootstrap-admin-url http://{{ os_controller_vip }}:5000/v3/ --bootstrap-internal-url http://{{ os_controller_vip }}:5000/v3/ --bootstrap-public-url http://{{ os_controller_vip }}:5000/v3/ --bootstrap-region-id RegionOne && \
+    touch setup_keystone_vip.done
+  args:
+    chdir: /etc/keystone
+    creates: setup_keystone_vip.done
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone
+
+- name: "Configure apache2"
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    regexp: '^ServerName'
+    insertafter: EOF
+    line: 'ServerName {{ ansible_eno3.ipv4.address }}'
+    backup: yes
+  notify: restart apache2
+  tags:
+    - keystone
+
+- name: "Configure /etc/apache2/ports.conf"
+  template:
+    src: ports.conf.j2
+    dest: /etc/apache2/ports.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart apache2
+  tags:
+    - keystone
+
+- name: "Configure keystone-api, nova-placement-api, cinder-wsgi"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - { src: "keystone.api.conf.j2", dest: "/etc/apache2/sites-available/keystone.conf" }
+    - { src: "nova-placement-api.conf.j2", dest: "/etc/apache2/sites-available/nova-placement-api.conf" }
+    - { src: "cinder-wsgi.conf.j2", dest: "/etc/apache2/conf-available/cinder-wsgi.conf" }
+  notify: restart apache2
+  tags:
+    - keystone
+
+- meta: flush_handlers
+  tags:
+    - keystone
+
+- name: "Configure client env"
+  template:
+    src: admin-openrc.sh.j2
+    dest: /etc/profile.d/admin-openrc.sh
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - keystone
+
+## Genrate Keystone Data ##
+
+- name: "Create service project"
+  os_project:
+    state: present
+    name: service
+    description: "Service Project"
+    domain_id: default
+    enabled: True
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Create some users"
+  os_user:
+    state: present
+    name: "{{ item.name }}"
+    password: "{{ item.pass }}"
+    domain: default
+    default_project: service
+  with_items:
+    - { name: "placement", pass: "{{ placement_pass }}" }
+    - { name: "glance", pass: "{{ glance_pass }}" }
+    - { name: "nova", pass: "{{ nova_pass }}" }
+    - { name: "neutron", pass: "{{ neutron_pass }}" }
+    - { name: "cinder", pass: "{{ cinder_pass }}" }
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Grant an admin role on the users in the project service"
+  os_user_role:
+    user: "{{ item }}"
+    role: admin
+    project: service
+  with_items:
+    - placement
+    - glance
+    - nova
+    - neutron
+    - cinder
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Create some services"
+  os_keystone_service:
+     state: present
+     name: "{{ item.name }}"
+     service_type: "{{ item.st }}"
+     description: "{{ item.des }}"
+  with_items:
+    - { name: "placement", st: "placement", des: "Placement API" }
+    - { name: "glance", st: "image", des: "OpenStack Image" }
+    - { name: "nova", st: "compute", des: "OpenStack Compute" }
+    - { name: "neutron", st: "network", des: "OpenStack Networking" }
+    - { name: "cinderv2", st: "volumev2", des: "OpenStack Block Storage" }
+    - { name: "cinderv3", st: "volumev3", des: "OpenStack Block Storage" }
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Create some public endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: public
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  with_items:
+    - { service: "placement", url: "http://{{ os_controller_vip }}:8778" }
+    - { service: "glance", url: "http://{{ os_controller_vip }}:9292" }
+    - { service: "nova", url: "http://{{ os_controller_vip }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ os_controller_vip }}:9696" }
+    - { service: "cinderv2", url: "http://{{ os_controller_vip }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ os_controller_vip }}:8776/v3/%(project_id)s" }
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Create some internal endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: internal
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  with_items:
+    - { service: "placement", url: "http://{{ os_controller_vip }}:8778" }
+    - { service: "glance", url: "http://{{ os_controller_vip }}:9292" }
+    - { service: "nova", url: "http://{{ os_controller_vip }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ os_controller_vip }}:9696" }
+    - { service: "cinderv2", url: "http://{{ os_controller_vip }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ os_controller_vip }}:8776/v3/%(project_id)s" }
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+- name: "Create some admin endpoints"
+  os_keystone_endpoint:
+     service: "{{ item.service }}"
+     endpoint_interface: admin
+     url: "{{ item.url }}"
+     region: RegionOne
+     state: present
+  with_items:
+    - { service: "placement", url: "http://{{ os_controller_vip }}:8778" }
+    - { service: "glance", url: "http://{{ os_controller_vip }}:9292" }
+    - { service: "nova", url: "http://{{ os_controller_vip }}:8774/v2.1" }
+    - { service: "neutron", url: "http://{{ os_controller_vip }}:9696" }
+    - { service: "cinderv2", url: "http://{{ os_controller_vip }}:8776/v2/%(project_id)s" }
+    - { service: "cinderv3", url: "http://{{ os_controller_vip }}:8776/v3/%(project_id)s" }
+  environment: "{{ os_admin_env }}"
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - keystone_data
+
+## End

@@ -1,0 +1,10 @@
+# Keystone
+UserParameter=openstack.keystone.service.status,/usr/local/bin/openstack_status.sh keystone
+# Glance
+UserParameter=openstack.glance.service.status,/usr/local/bin/openstack_status.sh glance
+# Nova
+UserParameter=openstack.nova.service.status[*],/usr/local/bin/openstack_status.sh $1
+# Neutron
+UserParameter=openstack.neutron.service.status[*],/usr/local/bin/openstack_status.sh $1
+# Cinder
+UserParameter=openstack.cinder.service.status[*],/usr/local/bin/openstack_status.sh $1

@@ -1,0 +1,17 @@
+ProxyMode={{ zabbix_proxy_mode }}
+Server={{ zabbix_server_address }}
+Hostname={{ ansible_hostname }}
+LogFile=/var/log/zabbix-proxy/zabbix_proxy.log
+PidFile=/var/run/zabbix/zabbix_proxy.pid
+DBHost={{ zabbix_proxy_dbhost }}
+DBName={{ zabbix_proxy_dbname }}
+DBSchema={{ zabbix_proxy_dbschema }}
+DBUser={{ zabbix_proxy_dbuser }}
+DBPassword={{ zabbix_proxy_dbpassword }}
+ConfigFrequency={{ zabbix_proxy_config_frequency }}
+DataSenderFrequency={{ zabbix_proxy_data_sender_frequency }}
+Timeout=30
+FpingLocation=/usr/bin/fping
+Fping6Location=/usr/bin/fping6
+LogSlowQueries=3000
+Include=/etc/zabbix/zabbix_proxy.conf.d/*.conf

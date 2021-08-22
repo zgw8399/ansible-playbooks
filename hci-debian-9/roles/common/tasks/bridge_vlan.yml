@@ -1,0 +1,18 @@
+- name: "Create some vlan interfaces and bridges"
+  shell: |
+    vconfig add {{ vlan_interface }} {{ item }} && \
+    brctl addbr br{{ item }} && \
+    brctl addif br{{ item }} {{ vlan_interface }}.{{ item }} && \
+    touch create_vlans.done
+  args:
+    chdir: /etc/network
+    creates: create_vlans.done
+  with_items: "{{ vlan_ids }}"
+
+- name: "Configure network"
+  template:
+    src: bridge_vlan.j2
+    dest: /etc/network/interfaces.d/bridge_vlan
+    owner: root
+    group: root
+    mode: '0644'

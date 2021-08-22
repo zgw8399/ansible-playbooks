@@ -1,0 +1,344 @@
+filter {
+  if "syslog" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{SYSLOGBASE} %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+  
+  else if "ceph" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NOTSPACE:logsource} %{NOTSPACE:client} %{NOTSPACE:client_ip} %{NOTSPACE} : %{NOTSPACE:program} \[%{NOTSPACE:log_level}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+  
+  else if "ceph-audit" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NOTSPACE:logsource} %{NOTSPACE:client} %{NOTSPACE:client_ip} %{NOTSPACE} : %{NOTSPACE:program} \[%{NOTSPACE:log_level}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+  
+  else if "ceph-mgr" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NOTSPACE}%{SPACE}+%{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+
+  else if "haproxy" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{HAPROXYTCP}"
+        ]
+      }
+    }
+  }
+
+  else if "pacemaker" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{SYSLOGTIMESTAMP:timestamp} \[%{NUMBER:pid}\] %{NOTSPACE:logsource}%{SPACE}+%{NOTSPACE:program}:%{SPACE}+%{NOTSPACE:log_level}: %{NOTSPACE:log_type}%{SPACE}+%{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    mutate {
+      uppercase => [ "log_level" ]
+    }
+  }
+
+  else if "pcsd" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{NOTSPACE} \[%{NOTSPACE:timestamp} %{NOTSPACE}\]%{SPACE}+%{NOTSPACE:log_level} -- : %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+
+  else if "rabbitmq" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "(?m)^=%{NOTSPACE:log_level} %{NOTSPACE}==== %{NOTSPACE:timestamp} ===%{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+
+  else if "nova-api" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[-\] %{IP:client_ip} \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" status: %{NUMBER:response} len: %{NUMBER:bytes} time: %{GREEDYDATA:time}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{IP:client_ip} \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" status: %{NUMBER:response} len: %{NUMBER:bytes} time: %{GREEDYDATA:time}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "nova-scheduler" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} .*\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "glance-api" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[-\] %{IP:client_ip} - - \[(?<request_time>.*)\] \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" %{NUMBER:response} %{NUMBER:bytes} %{GREEDYDATA:time}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{IP:client_ip} - - \[(?<request_time>.*)\] \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" %{NUMBER:response} %{NUMBER:bytes} %{GREEDYDATA:time}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "cinder-scheduler" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} .*\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "keystone-wsgi-public" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{WORD:verb} %{GREEDYDATA:request}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} .*\] %{WORD:verb} %{GREEDYDATA:request}"
+        ]
+      }
+    }
+    if [message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "keystone-manage" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} .*\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "neutron-server" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{IP:client_ip} \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" status: %{NUMBER:response}%{SPACE}+len: %{BASE16FLOAT:bytes} time: %{GREEDYDATA:time}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [message] =~ ".*DBConnectionError.*2013.*SELECT.*|.*floatingips.*" {
+      drop {}
+    }
+  }
+
+  else if "horizon" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{COMBINEDAPACHELOG}"
+        ]
+      }
+    }
+  }
+
+  else if "cinder-api" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{COMBINEDAPACHELOG} %{GREEDYDATA:time}"
+        ]
+      }
+    }
+  }
+
+  else if "keystone-api" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{COMBINEDAPACHELOG}"
+        ]
+      }
+    }
+    mutate {
+      remove_field => [
+        "message"
+      ]
+    }
+  }
+
+  else if "nova-placement-api" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{COMBINEDAPACHELOG}"
+        ]
+      }
+    }
+  }
+
+  else if "horizon-error" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{HTTPD24_ERRORLOG}"
+        ]
+      }
+    }
+  }
+
+  else if "keystone-api-error" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{GREEDYDATA:message}"
+        ]
+      }
+    }
+  }
+
+  else if "nova-placement-api-error" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601} %{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[%{WORD}-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{IPV4:client_ip} \"%{WORD:verb} %{NOTSPACE:request}\" status\: %{NUMBER:response} len\: %{NUMBER:bytes} microversion\: %{NUMBER:httpversion}"
+        ]
+      }
+    }
+  }
+
+  else if "cinder-api-error" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601} %{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{WORD:verb} (?<reguest>http://.*)",
+          "^%{TIMESTAMP_ISO8601} %{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] (?<reguest>http://.*) returned with HTTP %{NUMBER:response}",
+          "^%{TIMESTAMP_ISO8601} %{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "nova-compute" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "neutron-dhcp-agent" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "neutron-metadata-agent" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[-\] %{IP:client_ip}%{NOTSPACE} \"%{WORD:verb} %{NOTSPACE:request} HTTP\/%{NOTSPACE:httpversion}\" status: %{NUMBER:response} len: %{NUMBER:bytes} time: %{GREEDYDATA:time}"
+        ]
+      }
+    }
+  }
+
+  else if "neutron-openvswitch-agent" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}",
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[-\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+
+  else if "openvswitch" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{NOTSPACE:timestamp}\|%{NOTSPACE}\|%{NOTSPACE}\|%{NOTSPACE:log_level}\|%{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+  }
+
+  else if "cinder-volume" in [tags] {
+    grok {
+      match => {
+        "message" => [
+          "^%{TIMESTAMP_ISO8601:timestamp} %{NUMBER:pid} (?<log_level>AUDIT|CRITICAL|DEBUG|INFO|TRACE|WARNING|ERROR) %{NOTSPACE:program} \[req-%{NOTSPACE:request_id} %{NOTSPACE:user_id} %{NOTSPACE:project_id} - %{NOTSPACE:user_domain} %{NOTSPACE:project_domain}\] %{GREEDYDATA:log_message}"
+        ]
+      }
+    }
+    if [log_message] =~ ".*DBConnectionError.*2013.*SELECT.*" {
+      drop {}
+    }
+  }
+}

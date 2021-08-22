@@ -1,0 +1,1 @@
+UserParameter=memcached.stats[*],(echo stats; sleep 1) | telnet {{ ansible_eno3.ipv4.address }} 11211 2>&1 | awk '/STAT $1 / {print $NF}'

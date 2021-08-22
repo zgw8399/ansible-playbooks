@@ -1,0 +1,33 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Installing common software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apt-transport-https
+    - sudo
+    - python
+    - python-openstackclient
+    - rsync
+  tags:
+    - install
+
+- name: "Installing ceph software"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceph
+    - ceph-mds
+  tags:
+    - install
+    - ceph

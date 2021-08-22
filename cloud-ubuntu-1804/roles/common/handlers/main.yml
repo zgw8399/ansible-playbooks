@@ -1,0 +1,15 @@
+---
+# handlers for common role
+#
+- name: reload ssh
+  systemd:
+    name: ssh
+    state: reloaded
+
+- name: restart ssh
+  systemd:
+    name: ssh
+    state: restarted
+
+- name: reload proxy_env
+  shell: . /etc/profile.d/proxy.sh

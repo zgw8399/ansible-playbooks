@@ -1,0 +1,22 @@
+- name: "Configure cinder"
+  template:
+    src: cinder.conf.j2
+    dest: /etc/cinder/cinder.conf
+    owner: root
+    group: cinder
+    mode: '0644'
+  notify:
+    - restart cinder-scheduler
+    - stop cinder-volume
+    - reload apache2
+  tags:
+    - cinder
+
+- name: "Import cinder date"
+  shell: |
+    su -s /bin/sh -c "cinder-manage db sync" cinder && touch import_data.done
+  args:
+    chdir: /etc/cinder
+    creates: import_data.done
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"

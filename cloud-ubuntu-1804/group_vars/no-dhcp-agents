@@ -1,0 +1,3 @@
+---
+#
+neutron_role: no_dhcp_agent

@@ -1,0 +1,6 @@
+---
+# vars for chassis group
+#
+# Vlan
+vlan_interface: eno1
+storage_interface: eno2

@@ -1,0 +1,14 @@
+- name: "Configure libvirtd"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: "libvirtd.conf.j2", dest: "/etc/libvirt/libvirtd.conf" }
+    - { src: "libvirtd.j2", dest: "/etc/default/libvirtd" }
+  notify:
+    - restart libvirtd
+  tags:
+    - libvirtd

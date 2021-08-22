@@ -1,0 +1,50 @@
+- import_tasks: ubuntu.yml
+
+- name: "Create the directory"
+  file:
+    path: /etc/systemd/system/elasticsearch.service.d
+    state: directory
+    mode: '0755'
+
+- name: "Configure systemd"
+  template:
+    src: override.conf.j2
+    dest: /etc/systemd/system/elasticsearch.service.d/override.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify:
+    - restart elasticsearch
+
+- name: "Configure vm.swappiness"
+  sysctl:
+    name: vm.swappiness
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+
+- name: "Create the directory of data"
+  file:
+    path: "{{ es_path_data }}"
+    state: directory
+    owner: elasticsearch
+    group: elasticsearch
+    mode: '2750'
+
+- name: "Configure elasticsearch"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: elasticsearch
+    mode: '0660'
+    backup: yes
+  with_items:
+    - { src: "elasticsearch.yml.j2", dest: "/etc/elasticsearch/elasticsearch.yml" }
+    - { src: "jvm.options.j2", dest: "/etc/elasticsearch/jvm.options" }
+    - { src: "elasticsearch.j2", dest: "/etc/default/elasticsearch" }
+  notify:
+    - restart elasticsearch

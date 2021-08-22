@@ -1,0 +1,30 @@
+# Add user
+#
+- name: "Create user."
+  user:
+    name: webvirtmgr
+    uid: 1002
+    password: $6$g3cybXc5KgR/5Y$974NVBwAgTWVllTDrvHBR8YcjLhoFAyMCiGCkQv/6mwQvWU8UxQJXKk2p2ITuyTnYgylh7WehP8hc46XKXeut.
+    comment: Webvirtmgr
+    append: yes
+    groups: libvirt
+    shell: /bin/bash
+    state: present
+
+# Add directory
+#
+- name: "Add directory."
+  file:
+    path: /home/webvirtmgr/.ssh
+    state: directory
+    recurse: yes
+    owner: webvirtmgr
+    group: webvirtmgr
+    mode: '0700'
+
+# Modify privilegus
+#
+- name: "Set up permissions to manage libvirt"
+  template:
+    src: 50-libvirt-remote-access.pkla.j2
+    dest: /etc/polkit-1/localauthority/50-local.d/50-libvirt-remote-access.pkla

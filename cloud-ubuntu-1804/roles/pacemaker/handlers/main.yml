@@ -1,0 +1,14 @@
+---
+# handlers for pacemaker role
+#
+- name: restart pacemaker
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: pacemaker
+
+- name: restart corosync
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: corosync

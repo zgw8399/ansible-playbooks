@@ -1,0 +1,14 @@
+---
+- hosts:
+    - computes-2
+  become: true
+  pre_tasks:
+    - name: "Update apt cache"
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+  roles:
+    - zabbix
+      #  environment:
+      #    http_proxy: "http://keda:kedaadmin499@10.60.11.15:3128"
+      #    https_proxy: "https://keda:kedaadmin499@10.60.11.15:3128"

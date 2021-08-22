@@ -1,0 +1,19 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Install memcached"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - memcached
+    - python-memcache
+  tags:
+    - install

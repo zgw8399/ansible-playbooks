@@ -1,0 +1,11 @@
+LogFile=/var/log/zabbix-server/zabbix_server.log
+PidFile=/var/run/zabbix/zabbix_server.pid
+DBHost={{ zabbix_server_dbhost }}
+DBName={{ zabbix_server_dbname }}
+DBUser={{ zabbix_server_dbuser }}
+DBPassword={{ zabbix_server_dbpassword }}
+Timeout=4
+AlertScriptsPath=/etc/zabbix/alert.d/
+FpingLocation=/usr/bin/fping
+LogSlowQueries=3000
+Include=/etc/zabbix/zabbix_server.conf.d/*.conf

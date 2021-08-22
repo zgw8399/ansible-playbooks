@@ -1,0 +1,17 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config logstash"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  with_items:
+    - { src: "jvm.options.j2", dest: "/etc/logstash/jvm.options" }
+    - { src: "pipeline.conf.j2", dest: "/etc/logstash/conf.d/pipeline.conf" }
+    - { src: "filter.conf.j2", dest: "/etc/logstash/conf.d/filter.conf" }
+  notify: restart logstash
+  tags:
+    - config

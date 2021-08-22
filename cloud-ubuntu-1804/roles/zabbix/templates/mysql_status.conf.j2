@@ -1,0 +1,10 @@
+# MySQL
+UserParameter=mysql.status[*],/usr/local/bin/mysql_status.sh $1
+UserParameter=mysql.ping,/usr/local/bin/mysql_status.sh Ping
+UserParameter=mysql.version,/usr/local/bin/mysql_status.sh Version
+# Replication
+UserParameter=mysql.replication,/usr/local/bin/mysql_status.sh Replication
+UserParameter=mysql.rpl_semi_sync_master,/usr/local/bin/mysql_status.sh Rpl_semi_sync_master
+UserParameter=mysql.rpl_semi_sync_slave,/usr/local/bin/mysql_status.sh Rpl_semi_sync_slave
+# Cluster
+UserParameter=cluster.status[*],/usr/local/bin/mysql_status.sh $1

@@ -1,0 +1,65 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Installing some software"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ipset
+    - ipvsadm
+    - apt-transport-https
+    - curl
+  tags:
+    - install
+
+- name: "Add k8s GPG key"
+  apt_key:
+    url: https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg
+    state: present
+  tags:
+    - install
+
+- name: "Add k8s repo"
+  apt_repository:
+    repo: "deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main"
+    state: present
+    filename: k8s
+    update_cache: yes
+  tags:
+    - install
+
+- name: "Install k8s"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - "kubeadm={{ k8s_package_version }}"
+    - "kubelet={{ k8s_package_version }}"
+    - "kubectl={{ k8s_package_version }}"
+  tags:
+    - install
+
+- name: "Enable kubelet service"
+  shell: systemctl enable kubelet.service
+  tags:
+    - install
+
+- name: "Hold k8s packages"
+  shell: |
+    apt-mark hold {{ item }}
+  with_items:
+    - docker.io
+    - kubeadm
+    - kubelet
+    - kubectl
+  tags:
+    - install

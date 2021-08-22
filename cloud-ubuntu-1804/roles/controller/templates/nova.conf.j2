@@ -1,0 +1,92 @@
+[DEFAULT]
+
+lock_path = /var/lock/nova
+state_path = /var/lib/nova
+transport_url = rabbit://{{ rabbit_cluster }}
+my_ip = {{ ansible_eno3.ipv4.address }}
+osapi_compute_listen = {{ ansible_eno3.ipv4.address }}
+novncproxy_host = {{ ansible_eno3.ipv4.address }}
+metadata_listen = {{ ansible_eno3.ipv4.address }}
+use_neutron = true
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+
+[api]
+
+auth_strategy = keystone
+
+[api_database]
+
+connection = mysql+pymysql://nova:{{ nova_dbpass }}@{{ os_db_host }}/nova_api
+
+[cinder]
+
+os_region_name = RegionOne
+
+[database]
+
+connection = mysql+pymysql://nova:{{ nova_dbpass }}@{{ os_db_host }}/nova
+
+[glance]
+
+api_servers = http://{{ os_controller_vip }}:9292
+
+[keystone_authtoken]
+
+auth_url = http://{{ os_controller_vip }}:5000/v3
+memcached_servers = {{ os_memcached_servers }}
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = nova
+password = {{ nova_pass }}
+token_cache_time = {{ keystone_token_cache_time }}
+
+[neutron]
+
+url = http://{{ os_controller_vip }}:9696
+auth_url = http://{{ os_controller_vip }}:5000
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = {{ neutron_pass }}
+service_metadata_proxy = true
+metadata_proxy_shared_secret = {{ metadata_secret }}
+
+[oslo_concurrency]
+
+lock_path = /var/lib/nova/tmp
+
+[oslo_messaging_rabbit]
+
+rabbit_retry_interval = 1
+rabbit_retry_backoff = 2
+rabbit_max_retries = 0
+rabbit_durable_queues = true
+rabbit_ha_queues = true
+
+[placement]
+
+region_name = RegionOne
+project_domain_name = Default
+project_name = service
+auth_type = password
+user_domain_name = Default
+auth_url = http://{{ os_controller_vip }}:5000/v3
+username = placement
+password = {{ placement_pass }}
+
+[scheduler]
+
+discover_hosts_in_cells_interval = 300
+
+[vnc]
+
+enabled = true
+server_listen = $my_ip
+server_proxyclient_address = $my_ip
+
+# End

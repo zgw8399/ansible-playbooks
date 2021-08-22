@@ -1,0 +1,14 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config memcached"
+  lineinfile:
+    path: /etc/memcached.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: yes
+  with_items:
+    - { regexp: "^-m", line: "-m {{ memory_size }}" }
+    - { regexp: "^-l", line: "-l {{ ansible_eno3.ipv4.address }}" }
+  notify: restart memcached
+  tags:
+    - memcached

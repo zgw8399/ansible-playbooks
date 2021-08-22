@@ -1,0 +1,41 @@
+[DEFAULT]
+
+show_image_direct_url = true
+show_multiple_locations = true
+bind_host = {{ ansible_eno3.ipv4.address }}
+
+enable_v1_api = False
+enable_v2_api = True
+
+[database]
+
+connection = mysql+pymysql://glance:{{ glance_dbpass }}@{{ os_db_host }}/glance
+
+[glance_store]
+
+default_store = rbd
+stores = rbd
+rbd_store_chunk_size = 8
+rbd_store_pool = {{ glance_rbd_store_pool }}
+rbd_store_user = {{ glance_rbd_store_user }}
+rbd_store_ceph_conf = /etc/ceph/ceph.conf
+
+[image_format]
+
+disk_formats = ami,ari,aki,vhd,vhdx,vmdk,raw,qcow2,vdi,iso,ploop.root-tar
+
+[keystone_authtoken]
+
+www_authenticate_uri = http://{{ os_controller_vip }}:5000
+auth_url = http://{{ os_controller_vip }}:5000
+memcached_servers = {{ os_memcached_servers }}
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = glance
+password = {{ glance_pass }}
+
+[paste_deploy]
+
+flavor = keystone

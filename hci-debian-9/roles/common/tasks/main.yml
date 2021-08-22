@@ -1,0 +1,104 @@
+# Install
+#
+- name: "Get dep for apt repo management"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - net-tools
+    - apt-transport-https
+    - sysv-rc-conf
+    - iftop
+    - tcpdump
+    - ceph-fuse
+    - ceph-common
+    #- ceph
+    #- ceph-mds
+    - monit
+    - chrony
+    - qemu
+    - qemu-kvm
+    - libvirt-daemon-system
+    - libvirt-clients
+    - virtinst
+    - qemu-block-extra
+    - netcat
+    - netcat-openbsd
+#
+# Modprobe
+#
+- name: "Add 802.1q module"
+  modprobe:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - 8021q
+    - rbd
+
+- name: "load module on boot"
+  template:
+    src: /etc/modules
+    dest: /etc/modules
+#
+# Bridge and Vlan
+#
+- name: "Create some vlan interfaces and bridges"
+  shell: |
+    vconfig add {{ vlan_interface }} {{ item }} && \
+    brctl addbr br{{ item }} && \
+    brctl addif br{{ item }} {{ vlan_interface }}.{{ item }} && \
+    touch create_vlans.done
+  args:
+    chdir: /etc/network
+    creates: create_vlans.done
+  with_items: "{{ vlan_ids }}"
+
+- name: "Configure network"
+  template:
+    src: bridge_vlan.j2
+    dest: /etc/network/interfaces.d/bridge_vlan
+    owner: root
+    group: root
+    mode: '0644'
+#
+# NTP
+#
+- name: "Configure chrony"
+  template:
+    src: /etc/chrony/chrony.conf
+    dest: /etc/chrony/chrony.conf
+  notify: restart chrony
+  tags:
+    - ntp
+#
+# Sysctl
+#
+- name: "Configure net.ipv4.ip_forward"
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+#
+# Hosts
+#
+- name: "Configure hosts"
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+  tags:
+    - hosts

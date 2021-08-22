@@ -1,0 +1,68 @@
+---
+# mysql
+mysql_datadir: /data/mysql
+mysql_bind_address: 0.0.0.0
+mysql_innodb_buffer_pool_size: 5120M
+mysql_innodb_log_file_size: 128M
+mysql_innodb_io_capacity: 600
+mysql_sync_binlog: 0
+mysql_max_connections: 1024
+
+# zabbix server
+zabbix_server_datafile_path: /usr/share/zabbix-server-mysql
+zabbix_server_timezone: Asia/Shanghai
+zabbix_server_dbhost: localhost
+zabbix_server_dbname: zabbix
+zabbix_server_dbuser: zabbix
+zabbix_server_dbpassword: <password>
+
+# zabbix proxy
+zabbix_server_address: "10.60.101.16"
+zabbix_proxy_datafile_path: /usr/share/zabbix-proxy-mysql
+zabbix_proxy_mode: 0
+zabbix_proxy_dbhost: localhost
+zabbix_proxy_dbname: zabbix
+zabbix_proxy_dbschema: MySQL
+zabbix_proxy_dbuser: zabbix
+zabbix_proxy_dbpassword: <password>
+zabbix_proxy_config_frequency: 600
+zabbix_proxy_data_sender_frequency: 2
+
+# zabbix agent
+zabbix_proxy1_address: "10.60.101.4"
+zabbix_proxy1_active: "10.60.101.4"
+zabbix_proxy2_address: "10.60.101.13"
+zabbix_proxy2_active: "10.60.101.13"
+
+# elasticsearch
+elasticsearch_deb_url: http://10.60.11.15/downloads/ELK/elasticsearch-7.4.0-amd64.deb
+es_java_opts_xms: "-Xms16g"
+es_java_opts_xmx: "-Xmx16g"
+es_cluster_name: logging-cloud
+es_path_data: /data/elasticsearch
+es_path_logs: /var/log/elasticsearch
+es_network_host: "0.0.0.0"
+es_host1: logging-server-data1
+es_host2: logging-server-data2
+es_host3: logging-server-data3
+es_host1_ip: "10.60.101.12"
+es_host2_ip: "10.60.101.3"
+es_host3_ip: "10.60.101.5"
+
+# kibana
+kibana_deb_url: http://10.60.11.15/downloads/ELK/kibana-7.4.0-amd64.deb
+kibana_server_port: 5601
+kibana_server_host: localhost
+kibana_index: ".kibana"
+
+# logstash
+logstash_deb_url: http://10.60.11.15/downloads/ELK/logstash-7.4.0.deb
+logstash_java_opts_xms: "-Xms4g"
+logstash_java_opts_xmx: "-Xmx4g"
+logstash_host1_ip: "10.60.101.30"
+logstash_host2_ip: "10.60.101.17"
+
+# filebeat
+filebeat_deb_url: http://10.60.11.15/downloads/ELK/filebeat-7.4.0-amd64.deb
+index_number_of_shards: 1
+kibana_host_ip: "10.60.101.22"

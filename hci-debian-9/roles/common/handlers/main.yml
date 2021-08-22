@@ -1,0 +1,8 @@
+---
+# handlers for common role
+#
+- name: restart chrony
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: chrony

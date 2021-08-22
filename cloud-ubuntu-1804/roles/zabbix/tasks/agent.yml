@@ -1,0 +1,52 @@
+- name: "Get apt source management dependencies"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Install zabbix-agent"
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - zabbix-agent
+  tags:
+    - install
+
+- name: "Configuring zabbix-agent"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: "zabbix_agentd.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf", mode: "0644" }
+  notify:
+    - restart zabbix-agent
+  tags:
+    - install
+
+- name: "Configuring zabbix-agent for controller node"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  with_items:
+    - { src: "mysql_status.sh.j2", dest: "/usr/local/bin/mysql_status.sh", mode: "0755" }
+    - { src: "mysql_status.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf.d/mysql_status.conf", mode: "0644" }
+    - { src: "memcached_status.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf.d/memcached_status.conf", mode: "0644" }
+    - { src: "rabbitmq_cluster_status.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf.d/rabbitmq_cluster_status.conf", mode: "0644" }
+    - { src: "ha_cluster_status.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf.d/ha_cluster_status.conf", mode: "0644" }
+    - { src: "openstack_status.sh.j2", dest: "/usr/local/bin/openstack_status.sh", mode: "0755" }
+    - { src: "openstack_status.conf.j2", dest: "/etc/zabbix/zabbix_agentd.conf.d/openstack_status.conf", mode: "0644" }
+  notify:
+    - restart zabbix-agent
+  tags:
+    - controller

@@ -1,0 +1,4 @@
+---
+- hosts: superx-1
+  roles:
+    - filebeat

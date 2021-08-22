@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# 此脚本检查cephfs是否被挂载
+#
+ST=`mount | grep 'kedacephfs' | wc -l`
+
+if [ "$ST" == "1" ];then
+    echo "Mounted kedacephfs!"
+    exit 0
+elif [ "$ST" == "0" ];then
+    echo "No mount kedacephfs!"
+    exit 1
+else
+    echo "Mount error!"
+    exit 2
+fi

@@ -1,0 +1,27 @@
+---
+# handlers file for zabbix role
+#
+- name: restart zabbix-server
+  service:
+    name: zabbix-server
+    state: restarted
+
+- name: reload apache2
+  service:
+    name: apache2
+    state: reloaded
+
+- name: restart mysql
+  service:
+    name: mysql
+    state: restarted
+
+- name: restart zabbix-proxy
+  service:
+    name: zabbix-proxy
+    state: restarted
+
+- name: restart zabbix-agent
+  service:
+    name: zabbix-agent
+    state: restarted

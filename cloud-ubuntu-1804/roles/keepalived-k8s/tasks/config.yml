@@ -1,0 +1,26 @@
+- name: "Set net.ipv4.ip_nonlocal_bind"
+  sysctl:
+    name: net.ipv4.ip_nonlocal_bind
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    sysctl_file: /etc/sysctl.conf
+
+- name: "Get mail_notify script"
+  template:
+    src: "mail_notify.py.j2"
+    dest: "/etc/keepalived/mail_notify.py"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Configure keepalived"
+  template:
+    src: "keepalived.conf.j2"
+    dest: "/etc/keepalived/keepalived.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart keepalived

@@ -1,0 +1,34 @@
+- name: "Configure ceph"
+  template:
+    src: "{{ item }}"
+    dest: "/etc/ceph/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - ceph.conf
+    - ceph.client.admin.keyring
+  tags:
+    - glance
+
+- name: "Configure glance"
+  template:
+    src: glance-api.conf.j2
+    dest: /etc/glance/glance-api.conf
+    owner: root
+    group: keystone
+    mode: '0644'
+  notify: restart glance-api
+  tags:
+    - glance
+
+- name: "Import glance data to database"
+  shell: |
+    su -s /bin/sh -c "glance-manage db_sync" glance && touch import_data.done
+  args:
+    chdir: /etc/glance
+    creates: import_data.done
+  run_once: true
+  delegate_to: "{{ controller_first_node }}"
+  tags:
+    - glance

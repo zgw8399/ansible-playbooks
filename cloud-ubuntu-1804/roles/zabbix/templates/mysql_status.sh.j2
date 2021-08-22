@@ -1,0 +1,147 @@
+#!/bin/bash
+#
+# Set up database, user, and password.
+#
+USER='{{ mariadb_monitoring_user }}'
+PASSWORD='{{ mariadb_monitoring_password }}'
+HOST_IP=$(ifconfig eno3 | grep -w inet | awk '{print $2}')
+#
+# Get binary program.
+#
+MYSQL=$(which mysql)
+MYSQLADMIN=$(which mysqladmin)
+#
+# Defining functions.
+#
+global_status(){
+  $MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "show global status" 2>/dev/null | awk '$1 ~ /'"$1"'$/ {print $2}'
+}
+slave_status(){
+  $MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "show slave status\G" 2>/dev/null | grep -w "$1:" | awk '{print $2}'
+}
+mysql_version(){
+  $MYSQL -V | awk -F '[ ,]' '{print $6}'
+}
+mysql_ping(){
+  $MYSQLADMIN -u$USER -p$PASSWORD -h$HOST_IP ping 2>/dev/null | wc -l
+}
+replication(){
+  NUM=$($MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "show slave status\G" 2>/dev/null | grep -E "Slave_IO_Running|Slave_SQL_Running" | awk '{print $2}' | grep -c Yes)
+  if [ $NUM -eq 2 ];then
+    echo 1
+  else
+    echo 0
+  fi
+}
+rpl_semi_sync_master(){
+  $MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "show global status" 2>/dev/null | grep -E "Rpl_semi_sync_master_status" | awk '{print $2}' | grep -c ON &>/dev/null
+  if [ $? -eq 0 ];then
+    echo 1
+  else
+    echo 0
+  fi
+}
+rpl_semi_sync_slave(){
+  $MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "show global status" 2>/dev/null | grep -E "Rpl_semi_sync_slave_status" | awk '{print $2}' | grep -c ON &>/dev/null
+  if [ $? -eq 0 ];then
+    echo 1
+  else
+    echo 0
+  fi
+}
+cluster_status(){
+  $MYSQL -u$USER -p$PASSWORD -h$HOST_IP -e "SHOW STATUS LIKE '%wsrep%';" 2>/dev/null | grep -w "$1" | awk '{print $2}'
+}
+#
+# Main program.
+#
+case $1 in
+  Com_select)
+    global_status $1 ;;
+  Com_insert)
+    global_status $1 ;;
+  Com_update)
+    global_status $1 ;;
+  Com_delete)
+    global_status $1 ;;
+  Com_begin)
+    global_status $1 ;;
+  Com_commit)
+    global_status $1 ;;
+  Com_rollback)
+    global_status $1 ;;
+  Questions)
+    global_status $1 ;;
+  Slow_queries)
+    global_status $1 ;;
+  Bytes_received)
+    global_status $1 ;;
+  Bytes_sent)
+    global_status $1 ;;
+  Uptime)
+    global_status $1 ;;
+  Slave_IO_Running)
+    slave_status $1 ;;
+  Slave_SQL_Running)
+    slave_status $1 ;;
+  Rpl_semi_sync_master_status)
+    global_status $1 ;;
+  Rpl_semi_sync_slave_status)
+    global_status $1 ;;
+  Version)
+    mysql_version ;;
+  Ping)
+    mysql_ping ;;
+  Replication)
+    replication ;;
+  Rpl_semi_sync_master)
+    rpl_semi_sync_master ;;
+  Rpl_semi_sync_slave)
+    rpl_semi_sync_slave ;;
+  wsrep_cluster_size)
+    cluster_status $1 ;;
+  wsrep_cluster_status)
+    cluster_status $1 ;;
+  wsrep_connected)
+    cluster_status $1 ;;
+  wsrep_incoming_addresses)
+    cluster_status $1 ;;
+  wsrep_local_commits)
+    cluster_status $1 ;;
+  wsrep_local_index)
+    cluster_status $1 ;;
+  wsrep_local_recv_queue)
+    cluster_status $1 ;;
+  wsrep_local_recv_queue_avg)
+    cluster_status $1 ;;
+  wsrep_local_recv_queue_max)
+    cluster_status $1 ;;
+  wsrep_local_recv_queue_min)
+    cluster_status $1 ;;
+  wsrep_local_replays)
+    cluster_status $1 ;;
+  wsrep_local_send_queue)
+    cluster_status $1 ;;
+  wsrep_local_send_queue_avg)
+    cluster_status $1 ;;
+  wsrep_local_send_queue_max)
+    cluster_status $1 ;;
+  wsrep_local_send_queue_min)
+    cluster_status $1 ;;
+  wsrep_local_state)
+    cluster_status $1 ;;
+  wsrep_local_state_comment)
+    cluster_status $1 ;;
+  wsrep_provider_name)
+    cluster_status $1 ;;
+  wsrep_provider_version)
+    cluster_status $1 ;;
+  wsrep_ready)
+    cluster_status $1 ;;
+  wsrep_thread_count)
+    cluster_status $1 ;;
+  *)
+    echo "Usage: $0 { Com_select | Com_insert | Com_update | Com_delete | Com_begin | Com_commit | Com_rollback | Questions | Slow_queries | Bytes_received | Bytes_sent | Uptime | Slave_IO_Running | Slave_SQL_Running | Rpl_semi_sync_master_status | Rpl_semi_sync_slave_status | Version | Ping | Replication | Rpl_semi_sync_master | Rpl_semi_sync_slave }" ;;
+esac
+#
+# End.

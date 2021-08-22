@@ -1,0 +1,25 @@
+- import_tasks: ubuntu.yml
+
+- name: "Config kibana"
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  notify: restart kibana
+  tags:
+    - config
+
+- name: "Configure nginx"
+  template:
+    src: nginx-default.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify: restart nginx
+  tags:
+    - config

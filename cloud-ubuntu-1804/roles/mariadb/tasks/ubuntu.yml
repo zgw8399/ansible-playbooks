@@ -1,0 +1,35 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-apt
+    - python-pycurl
+  tags:
+    - install
+
+- name: "Install mariadb"
+  apt: 
+    name=mariadb-server
+    state=present
+  tags:
+    - install
+
+- name: "Install mysql_db module"
+  apt: 
+    name={{ item }}
+    state=present
+  with_items:
+    - python-mysqldb
+    - python-pymysql
+    - libaio1
+    - libaio-dev
+  tags:
+    - install
+
+- name: "Install xinetd"
+  apt:
+    name=xinetd
+    state=present
+  tags:
+    - install

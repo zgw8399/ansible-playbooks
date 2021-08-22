@@ -1,0 +1,31 @@
+- name: "Get dep for apt repo management"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - net-tools
+    - apt-transport-https
+    - sysv-rc-conf
+    - iftop
+    - tcpdump
+    - ceph-fuse
+    - ceph-common
+    #- ceph
+    #- ceph-mds
+    - monit
+    - chrony
+    - qemu
+    - qemu-kvm
+    - libvirt-daemon-system
+    - libvirt-clients
+    - virtinst
+    - qemu-block-extra

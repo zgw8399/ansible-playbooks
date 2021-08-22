@@ -1,0 +1,25 @@
+# VM networks
+
+auto br33
+iface br33 inet static
+bridge_ports {{ vlan_interface }}.33
+address 0.0.0.0
+netmask 255.255.255.0
+
+auto br40
+iface br40 inet static
+bridge_ports {{ vlan_interface }}.40
+address 0.0.0.0
+netmask 255.255.255.0
+
+auto br999
+iface br999 inet static
+bridge_ports {{ vlan_interface }}.999
+address 0.0.0.0
+netmask 255.255.255.0
+
+auto br3018
+iface br3018 inet static
+bridge_ports {{ vlan_interface }}.3018
+address 0.0.0.0
+netmask 255.255.255.0

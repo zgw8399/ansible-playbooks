@@ -1,0 +1,17 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install logstash"
+  apt:
+    deb: "{{ logstash_deb_url }}"
+
+- name: "Enable logstash.service"
+  shell: systemctl enable logstash.service && touch enable_logstash_service.done
+  args:
+    chdir: /etc/logstash
+    creates: enable_logstash_service.done

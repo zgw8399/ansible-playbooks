@@ -1,0 +1,8 @@
+---
+# handlers for keepalived role
+#
+- name: restart keepalived
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: keepalived

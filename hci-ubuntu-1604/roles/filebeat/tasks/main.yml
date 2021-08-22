@@ -1,0 +1,23 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install filebeat"
+  apt:
+    deb: "{{ filebeat_deb_url }}" 
+
+- name: "Config filebeat"
+  template:
+    src: filebeat.yml.j2
+    dest: /etc/filebeat/filebeat.yml
+    owner: root
+    group: root
+    mode: 0600
+    backup: yes
+  notify: restart filebeat
+  tags:
+    - config

@@ -1,0 +1,34 @@
+[DEFAULT]
+
+core_plugin = ml2
+transport_url = rabbit://{{ rabbit_cluster }}
+auth_strategy = keystone
+
+[agent]
+
+root_helper = "sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf"
+
+[keystone_authtoken]
+
+auth_uri = http://{{ os_controller_vip }}:5000
+auth_url = http://{{ os_controller_vip }}:5000
+memcached_servers = {{ os_memcached_servers }}
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = {{ neutron_pass }}
+token_cache_time = {{ keystone_token_cache_time }}
+
+[oslo_concurrency]
+
+lock_path = /var/lib/neutron/tmp
+
+[oslo_messaging_rabbit]
+
+rabbit_retry_interval = 1
+rabbit_retry_backoff = 2
+rabbit_max_retries = 0
+rabbit_durable_queues = true
+rabbit_ha_queues = true

@@ -1,0 +1,42 @@
+[mysqld_safe]
+
+socket          = /var/run/mysqld/mysqld.sock
+nice            = 0
+
+[mysqld]
+
+user            = mysql
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+port            = 3306
+basedir         = /usr
+datadir         = {{ mysql_datadir }}
+tmpdir          = /tmp
+lc-messages-dir = /usr/share/mysql
+
+skip-external-locking
+
+bind-address            = {{ mysql_bind_address }}
+key_buffer_size         = 16M
+max_allowed_packet      = 16M
+thread_stack            = 192K
+thread_cache_size       = 16
+innodb_buffer_pool_size = {{ mysql_innodb_buffer_pool_size }}
+
+innodb_buffer_pool_instances   = 8
+innodb_thread_concurrency      = 0
+innodb_flush_log_at_trx_commit = 0
+innodb_flush_method            = O_DIRECT
+innodb_log_file_size           = {{ mysql_innodb_log_file_size }}
+innodb_io_capacity             = {{ mysql_innodb_io_capacity }}
+sync_binlog                    = {{ mysql_sync_binlog }}
+
+skip-name-resolve
+
+max_connections         = {{ mysql_max_connections }}
+query_cache_limit       = 1M
+query_cache_size        = 0
+query_cache_type        = 0
+log_error               = /var/log/mysql/error.log
+expire_logs_days        = 10
+max_binlog_size         = 100M

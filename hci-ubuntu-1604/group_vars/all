@@ -1,0 +1,43 @@
+---
+# vars for all groups
+#
+# Vlan
+vlan_ids:
+  - 33
+  - 40
+  - 999
+  - 3018
+vlan_interface: eno1
+storage_interface: eno2
+
+# NTP
+ntp_servers:
+  - 192.168.5.200
+  
+# Common
+deploy_user_name: storageadmin
+deploy_user_id: 1100
+# install whois
+# generate password command: "mkpasswd --method=sha-512"
+# password: GuoXing#ITadmin.
+deploy_user_password: "$6$71MDHDqX3b$b/doZr3H81JD3O9basco4kd/T0uzEhvanrSsteeoWtBxhF225MsNGvm1F99NRRx0wXwZox3MEnb9B5t3rm1Om0"
+deploy_user_comment: "Ceph Deploy User"
+deploy_user_shell: /bin/bash
+local_user: guoxing
+
+# Storage
+ceph_cluster_conf_dir: /home/guoxing/kedaceph-cluster
+ceph_conf_dir: /etc/ceph
+cephfs_mount_dir: /storage
+
+# Container
+insecure_registries: 0.0.0.0/0
+data_root: /var/lib/docker
+storage_driver: overlay2
+docker_log_max_size: 100m
+docker_log_max_file: 3
+
+# filebeat
+filebeat_deb_url: http://10.60.11.15/downloads/ELK/filebeat-7.4.0-amd64.deb
+index_number_of_shards: 1
+kibana_host_ip: "10.60.101.22"

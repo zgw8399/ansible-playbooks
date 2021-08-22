@@ -1,0 +1,21 @@
+- name: "Get dep for apt repo management"
+  apt: 
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-apt
+    - python-pycurl
+
+- name: "Install software"
+  apt:
+    name: "{{ item }}"
+    state: present
+    install_recommends: no
+  with_items:
+    - pacemaker
+    - corosync
+    - openstack-resource-agents
+    - ipmitool
+    - crmsh
+    - fence-agents
+    - pcs

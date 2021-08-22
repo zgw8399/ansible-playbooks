@@ -1,0 +1,25 @@
+---
+# vars for all groups
+#
+# Common
+deploy_user_name: storageadmin
+deploy_user_id: 1100
+# install whois
+# generate password command: "mkpasswd --method=sha-512"
+# password: GuoXing#ITadmin.
+deploy_user_password: "$6$71MDHDqX3b$b/doZr3H81JD3O9basco4kd/T0uzEhvanrSsteeoWtBxhF225MsNGvm1F99NRRx0wXwZox3MEnb9B5t3rm1Om0"
+deploy_user_comment: "Ceph Deploy User"
+deploy_user_shell: /bin/bash
+local_user: guoxing
+
+# Container
+insecure_registries: 192.168.22.0/24
+docker_log_max_size: 100m
+docker_log_max_file: 3
+
+# filebeat
+filebeat_rpm: /root/filebeat-7.6.1-x86_64.rpm
+index_number_of_shards: 1
+kibana_host_ip: "192.168.22.10"
+logstash_host1_ip: "192.168.22.10"
+logstash_host2_ip: "192.168.22.11"

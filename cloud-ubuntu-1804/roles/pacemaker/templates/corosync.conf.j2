@@ -1,0 +1,51 @@
+totem {
+        version: 2
+        cluster_name: {{ ha_cluster_name }}
+        token: 3000
+        token_retransmits_before_loss_const: 10
+        clear_node_high_bit: yes
+        crypto_cipher: none
+        crypto_hash: none
+        interface {
+                ringnumber: 0
+                bindnetaddr: {{ interface_bind_net_addr }}
+                broadcast: yes
+                mcastport: 5405
+                ttl: 1
+        }
+        transport: udpu
+}
+
+nodelist {
+        node {
+                ring0_addr: {{ node1_ring0_addr }}
+                nodeid: 1
+        }
+        node {
+                ring0_addr: {{ node2_ring0_addr }}
+                nodeid: 2
+        }
+        node {
+                ring0_addr: {{ node3_ring0_addr }}
+                nodeid: 3
+        }
+}
+
+logging {
+        fileline: off
+        to_stderr: no
+        to_logfile: no
+        to_syslog: yes
+        syslog_facility: daemon
+        debug: off
+        timestamp: on
+        logger_subsys {
+                subsys: QUORUM
+                debug: off
+        }
+}
+
+quorum {
+        provider: corosync_votequorum
+        expected_votes: 2
+}

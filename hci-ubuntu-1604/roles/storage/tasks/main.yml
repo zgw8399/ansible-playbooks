@@ -1,0 +1,63 @@
+- name: "Get config file"
+  template:
+    src: "{{ ceph_cluster_conf_dir }}/{{ item }}"
+    dest: "{{ ceph_conf_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - ceph.conf
+    - ceph.client.admin.keyring
+
+- name: "Create mount directory"
+  file:
+    state: directory
+    path: "{{ cephfs_mount_dir }}"
+
+- name: "Mount cephfs"
+  shell: |
+    ceph-fuse {{ cephfs_mount_dir }} && touch mount_cephfs.done
+  args:
+    chdir: "{{ ceph_conf_dir }}"
+    creates: mount_cephfs.done
+
+- name: "Configure monit"
+  template:
+    src: /etc/monit/monitrc
+    dest: /etc/monit/monitrc
+  notify:
+    - restart monit
+
+- name: "Add monit config file"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/monit/conf.d/{{ item }}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - kedacephfs
+  notify:
+    - restart monit
+
+- name: "Create monit script directory"
+  file:
+    state: directory
+    path: /etc/monit/scripts
+  notify:
+    - restart monit
+
+- name: "Add monit script file"
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/monit/scripts/{{ item }}"
+    owner: root
+    group: root
+    mode: '0755'
+  with_items:
+    - check-kedacephfs.sh
+  notify:
+    - restart monit
+
+- name: "Check monit config"
+  shell: monit -t
