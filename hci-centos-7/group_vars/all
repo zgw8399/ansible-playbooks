@@ -6,11 +6,10 @@ deploy_user_name: storageadmin
 deploy_user_id: 1100
 # install whois
 # generate password command: "mkpasswd --method=sha-512"
-# password: GuoXing#ITadmin.
-deploy_user_password: "$6$71MDHDqX3b$b/doZr3H81JD3O9basco4kd/T0uzEhvanrSsteeoWtBxhF225MsNGvm1F99NRRx0wXwZox3MEnb9B5t3rm1Om0"
+deploy_user_password: ""
 deploy_user_comment: "Ceph Deploy User"
 deploy_user_shell: /bin/bash
-local_user: guoxing
+local_user: admin
 
 # Container
 insecure_registries: 192.168.22.0/24

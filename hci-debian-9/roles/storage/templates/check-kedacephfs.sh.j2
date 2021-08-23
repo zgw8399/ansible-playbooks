@@ -2,13 +2,13 @@
 #
 # 此脚本检查cephfs是否被挂载
 #
-ST=`mount | grep 'kedacephfs' | wc -l`
+ST=`mount | grep 'cephfs' | wc -l`
 
 if [ "$ST" == "1" ];then
-    echo "Mounted kedacephfs!"
+    echo "Mounted cephfs!"
     exit 0
 elif [ "$ST" == "0" ];then
-    echo "No mount kedacephfs!"
+    echo "No mount cephfs!"
     exit 1
 else
     echo "Mount error!"

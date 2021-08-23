@@ -13,9 +13,9 @@ ntp_servers:
   - 192.168.5.200
 
 # Storage
-ceph_cluster_conf_dir: /home/keda/kedaceph-cluster
+ceph_cluster_conf_dir: /home/test/testceph-cluster
 ceph_conf_dir: /etc/ceph
-cephfs_mount_dir: /kedacephfs
+cephfs_mount_dir: /testcephfs
 
 # Container
 docker_deb_url: "http://10.9.44.11/downloads/docker-ce_18.06.1~ce~3-0~debian_amd64.deb"

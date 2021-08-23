@@ -3,12 +3,12 @@
 vrrp_interface: eno1
 vrrp_auth_pass: 1111
 vrrp_vip: 10.60.11.100
-notify_mail_host: 10.9.33.233
-notify_mail_user: "zhanggwb"
-notify_mail_pass: "keda,99"
-notify_postfix: kedachina.com.cn
+notify_mail_host: ""
+notify_mail_user: ""
+notify_mail_pass: ""
+notify_postfix: test.com
 notify_ifname: eno1
 notify_mailto_list:
-  - zhanggwb@kedachina.com.cn
+  - test@test.com
 edge_node1: 10.60.11.4
 edge_node2: 10.60.11.20

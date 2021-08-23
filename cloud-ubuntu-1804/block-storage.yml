@@ -8,5 +8,5 @@
   roles:
     - block-storage
   environment:
-    http_proxy: "http://keda:kedaadmin499@10.60.11.15:3128"
-    https_proxy: "https://keda:kedaadmin499@10.60.11.15:3128"
+    http_proxy: "http://test:test@10.60.11.15:3128"
+    https_proxy: "https://test:test@10.60.11.15:3128"

@@ -4,15 +4,15 @@
 deploy_user_name: cephadmin
 deploy_user_id: 1100
 # generate password command: "mkpasswd --method=sha-512"
-deploy_user_password: "$6$bmLa4NyPpI$ZJIB3MDt5CaZ2zE/aMZQRVECr51MODfoHoLa/ShlxD6nCihN5SpfBmQhzy9b3tpPZm92.4gPdaEGlSVKBwMm8/"
+deploy_user_password: ""
 deploy_user_comment: "Ceph Deploy User"
 deploy_user_shell: /bin/bash
-local_user: keda
+local_user: test
 ceph_conf_dir: /etc/ceph
 
 ## storage cluster
 
-storage_cluster_dir: ~/kedacloud-storage
+storage_cluster_dir: ~/testcloud-storage
 public_network: 10.60.11.0/24
 cluster_network: 10.60.12.0/24
 mon_members: "C1-M620-16 C2-M620-15 C2-M620-16"
@@ -40,7 +40,7 @@ osd_scrub_end_hour: 7
 
 # pacemaker
 # generate password command: "mkpasswd --method=sha-512"
-hacluster_pass: "$6$fB3CUYlDhIc/qNRc$tg3GiD.SdgxiV.kWO2O2DM7fyIBSdTklfx2iaOCrSDTmpxVZrNAtf7t.JZpD3Qi3nITlF8S6bTbSJ6DdzNAoz1"
+hacluster_pass: ""
 ha_cluster_name: openstack-controller-cluster
 interface_bind_net_addr: 10.60.13.0
 node1_ring0_addr: controller-1
@@ -49,7 +49,7 @@ node3_ring0_addr: controller-3
 
 # haproxy
 haproxy_admin_user: admin
-haproxy_admin_pass: kedahaadmin499
+haproxy_admin_pass: <password>
 os_controller_vip: 10.60.13.100
 os_controller_node_1: 10.60.13.16
 os_controller_node_2: 10.60.13.31
@@ -80,7 +80,7 @@ cluster_name: openstack_mariadb_cluster
 cluster_address: "10.60.13.16,10.60.13.31,10.60.13.32"
 mariadb_cluster_first_node: C1-M620-16
 sst_method: rsync
-sst_auth: "wsrep:keda600499"
+sst_auth: "wsrep:wsrep"
 slave_threads: 8
 
 # health check
@@ -91,11 +91,11 @@ health_check_port: 9200
 ## openstack databases
 
 remote_access_hosts: "%"
-keystone_dbpass: keda#keystone
-glance_dbpass: keda#glance
-nova_dbpass: keda#nova
-neutron_dbpass: keda#neutron
-cinder_dbpass: keda#cinder
+keystone_dbpass: test#keystone
+glance_dbpass: test#glance
+nova_dbpass: test#nova
+neutron_dbpass: test#neutron
+cinder_dbpass: test#cinder
 
 ## rabbitmq cluster
 
@@ -103,7 +103,7 @@ erlang_cookie: QJPTXPIJRCOVPBKIQTFU
 rabbitmq_first_node: C1-M620-16
 rabbitmq_first_node_ip: C1-M620-16
 rabbitmq_admin_user: admin
-rabbitmq_admin_pass: kedarabbitmq499
+rabbitmq_admin_pass: <password>
 
 ## memcached cluster
 
@@ -114,17 +114,17 @@ memory_size: 8192
 os_release: queens
 os_db_host: 10.60.13.100
 os_memcached_servers: "10.60.13.16:11211,10.60.13.31:11211,10.60.13.32:11211"
-rabbit_cluster: "admin:kedarabbitmq499@10.60.13.16:5672,admin:kedarabbitmq499@10.60.13.31:5672,admin:kedarabbitmq499@10.60.13.32:5672"
+rabbit_cluster: "admin:password@10.60.13.16:5672,admin:password@10.60.13.31:5672,admin:password@10.60.13.32:5672"
 
 # Keystone
 controller_first_node: C1-M620-16
-os_admin_pass: keda#osadmin#499
+os_admin_pass: <password>
 os_admin_env: {
   OS_PROJECT_DOMAIN_NAME: Default,
   OS_USER_DOMAIN_NAME: Default,
   OS_PROJECT_NAME: admin,
   OS_USERNAME: admin,
-  OS_PASSWORD: "keda#osadmin#499",
+  OS_PASSWORD: "",
   OS_AUTH_URL: "http://10.60.13.100:5000/v3",
   OS_IDENTITY_API_VERSION: 3,
   OS_IMAGE_API_VERSION: 2
@@ -132,28 +132,28 @@ os_admin_env: {
 keystone_token_cache_time: 450
 
 # Placement
-placement_pass: keda#placement
+placement_pass: test#placement
 
 # Glance
-glance_pass: keda#glance
+glance_pass: test#glance
 glance_rbd_store_pool: images
 glance_rbd_store_user: admin
 
 # Nova
-nova_pass: keda#nova
+nova_pass: test#nova
 
 # Neutron
-neutron_pass: keda#neutron
+neutron_pass: test#neutron
 neutron_dhcp_agents_per_network: 2
-metadata_secret: keda#meta
+metadata_secret: test#meta
 
 # Cinder
-cinder_pass: keda#cinder
+cinder_pass: test#cinder
 
 ## openstack compute
 
 # nova-compute
-ceph_client_admin_key: "AQBbq1td9Nb9LhAAuC0YGkk+zANksaprfVeHww=="
+ceph_client_admin_key: ""
 ceph_rbd_user: admin
 secret_uuid: "677f9afe-b86c-4c9d-9ba7-9ae6478e3a73"
 libvirt_virt_type: kvm
@@ -171,6 +171,6 @@ cinder_backup_rbd_pool: backups
 zabbix_server_address: 10.60.101.4
 zabbix_server_active: 10.60.101.4
 mariadb_monitoring_user: "zabbix"
-mariadb_monitoring_password: "keda#monadmin"
+mariadb_monitoring_password: "test#monadmin"
 
 ## End
